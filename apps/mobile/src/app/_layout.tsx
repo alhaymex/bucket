@@ -1,13 +1,18 @@
 import { ConvexProvider } from "@/providers/convex";
+import { useAuth } from "@clerk/expo";
 import { Stack } from "expo-router";
 
 const Routes = () => {
-  const isLoggedIn = false;
+  const { isSignedIn } = useAuth();
 
   return (
     <Stack>
-      <Stack.Protected guard={isLoggedIn}></Stack.Protected>
-      <Stack.Protected guard={!isLoggedIn}></Stack.Protected>
+      <Stack.Protected guard={!!isSignedIn}>
+        <Stack.Screen name="(app)" />
+      </Stack.Protected>
+      <Stack.Protected guard={!isSignedIn}>
+        <Stack.Screen name="(auth)" />
+      </Stack.Protected>
     </Stack>
   );
 };

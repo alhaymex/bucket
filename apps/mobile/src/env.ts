@@ -5,6 +5,7 @@ const envSchema = z.object({
     .enum(["development", "test", "production"])
     .default("development"),
   EXPO_PUBLIC_CONVEX_URL: z.string(),
+  EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY: z.string(),
 });
 
 const parsed = envSchema.safeParse(process.env);

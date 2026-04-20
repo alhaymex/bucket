@@ -1,9 +1,20 @@
 import { env } from "@/env";
-import { createReactClient } from "@bucket/backend/client";
-import { ConvexProvider as Provider } from "convex/react";
+import { ClerkProvider, useAuth } from "@clerk/expo";
+import { tokenCache } from "@clerk/expo/token-cache";
+import { ConvexReactClient } from "convex/react";
+import { ConvexProviderWithClerk } from "convex/react-clerk";
 
-const client = createReactClient(env.EXPO_PUBLIC_CONVEX_URL);
+const client = new ConvexReactClient(env.EXPO_PUBLIC_CONVEX_URL);
 
 export const ConvexProvider = ({ children }: { children: React.ReactNode }) => {
-  return <Provider client={client}>{children}</Provider>;
+  return (
+    <ClerkProvider
+      publishableKey={env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY}
+      tokenCache={tokenCache}
+    >
+      <ConvexProviderWithClerk client={client} useAuth={useAuth}>
+        {children}
+      </ConvexProviderWithClerk>
+    </ClerkProvider>
+  );
 };
