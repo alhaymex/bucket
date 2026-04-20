@@ -8,7 +8,7 @@ const Routes = () => {
   const { isSignedIn } = useAuth();
 
   return (
-    <Stack>
+    <Stack screenOptions={{ headerShown: false }}>
       <Stack.Protected guard={!!isSignedIn}>
         <Stack.Screen name="(app)" />
       </Stack.Protected>

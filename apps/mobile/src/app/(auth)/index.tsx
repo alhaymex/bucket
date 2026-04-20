@@ -1,12 +1,9 @@
 import { View, Text } from "react-native";
 import React from "react";
+import Welcome from "@/components/screens/Welcome";
 
 const Index = () => {
-  return (
-    <View className="flex-1 items-center justify-center">
-      <Text className="text-3xl">Login to Bucket</Text>
-    </View>
-  );
+  return <Welcome />;
 };
 
 export default Index;
