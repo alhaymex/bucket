@@ -1,6 +1,7 @@
+import { ConvexProvider } from "@/providers/convex";
 import { Stack } from "expo-router";
 
-export default function RootLayout() {
+const Routes = () => {
   const isLoggedIn = false;
 
   return (
@@ -8,5 +9,13 @@ export default function RootLayout() {
       <Stack.Protected guard={isLoggedIn}></Stack.Protected>
       <Stack.Protected guard={!isLoggedIn}></Stack.Protected>
     </Stack>
+  );
+};
+
+export default function RootLayout() {
+  return (
+    <ConvexProvider>
+      <Routes />
+    </ConvexProvider>
   );
 }
