@@ -1,3 +1,5 @@
+import "@/styles/global.css";
+
 import { ConvexProvider } from "@/providers/convex";
 import { useAuth } from "@clerk/expo";
 import { Stack } from "expo-router";
