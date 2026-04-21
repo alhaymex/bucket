@@ -1,20 +1,86 @@
-import React from "react";
+import { useColors } from "@/hooks/useColors";
+import { useAuthFlowStore } from "@/store/authFlowStore";
+import { ArrowRight, Mail } from "lucide-react-native";
+import { useRouter } from "expo-router";
+import { useColorScheme } from "nativewind";
 import {
+  Alert,
+  Keyboard,
   KeyboardAvoidingView,
   Platform,
   Pressable,
   Text,
   TextInput,
   TouchableWithoutFeedback,
-  Keyboard,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { ArrowRight, Mail } from "lucide-react-native";
-import { useColors } from "@/hooks/useColors";
+
+import AppleLogoBlack from "@/assets/images/logos/apple-black.svg";
+import AppleLogoWhite from "@/assets/images/logos/apple-white.svg";
+import GoogleLogo from "@/assets/images/logos/google.svg";
+import { useSignUp, useSSO } from "@clerk/expo";
+import { useState } from "react";
 
 const SignUpScreen = () => {
+  const router = useRouter();
+  const { startSSOFlow } = useSSO();
+  const { signUp } = useSignUp();
+  const setAuthFlowEmail = useAuthFlowStore((state) => state.setEmail);
+
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+
   const token = useColors();
+  const { colorScheme } = useColorScheme();
+  const isDark = colorScheme === "dark";
+
+  const handleOAuth = async (strategy: "oauth_google" | "oauth_apple") => {
+    try {
+      const { createdSessionId, setActive } = await startSSOFlow({
+        strategy,
+      });
+
+      if (createdSessionId) {
+        await setActive!({ session: createdSessionId });
+      }
+    } catch (error) {
+      Alert.alert(
+        "Something went wrong",
+        "Unable to sign in with the selected provider.",
+      );
+      console.error("OAuth Sign-In Error:", error);
+    }
+  };
+
+  const handleEmailSignUp = async () => {
+    setLoading(true);
+
+    const trimmedEmail = email.trim();
+    if (!trimmedEmail) {
+      Alert.alert("Invalid Email", "Please enter a valid email address.");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const { error } = await signUp.create({ emailAddress: trimmedEmail });
+
+      if (!error) {
+        await signUp.verifications.sendEmailCode();
+        setAuthFlowEmail(trimmedEmail);
+        router.push("/(auth)/otp");
+      }
+    } catch (error) {
+      Alert.alert(
+        "Sign-Up Failed",
+        "An error occurred while creating your account. Please try again.",
+      );
+      console.error("Email Sign-Up Error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-bucket-background">
@@ -46,12 +112,15 @@ const SignUpScreen = () => {
                     keyboardType="email-address"
                     autoCapitalize="none"
                     autoCorrect={false}
+                    value={email}
+                    onChangeText={setEmail}
                   />
                 </View>
 
                 <Pressable
                   className="h-14 flex-row items-center justify-center gap-2 rounded-2xl bg-bucket-primary px-4"
-                  onPress={Keyboard.dismiss}
+                  onPress={() => handleEmailSignUp()}
+                  disabled={loading}
                 >
                   <Text className="font-semibold text-bucket-primary-foreground">
                     Continue
@@ -69,23 +138,26 @@ const SignUpScreen = () => {
 
                 <View className="flex-row gap-3">
                   <Pressable className="h-14 flex-1 flex-row items-center justify-center gap-2 rounded-2xl border border-bucket-border bg-bucket-muted px-4">
-                    <View className="h-8 w-8 items-center justify-center rounded-full bg-bucket-background">
-                      <Text className="text-base font-bold text-bucket-foreground">
-                        G
-                      </Text>
+                    <View>
+                      <GoogleLogo width={16} height={16} />
                     </View>
-                    <Text className="text-base font-semibold text-bucket-foreground">
+                    <Text className="text-lg mt-0.5 font-semibold text-bucket-foreground">
                       Google
                     </Text>
                   </Pressable>
 
-                  <Pressable className="h-14 flex-1 flex-row items-center justify-center gap-2 rounded-2xl border border-bucket-border bg-bucket-muted px-4">
-                    <View className="h-8 w-8 items-center justify-center rounded-full bg-bucket-background">
-                      <Text className="text-base font-bold text-bucket-foreground">
-                        A
-                      </Text>
+                  <Pressable
+                    className="h-14 flex-1 flex-row items-center justify-center gap-2 rounded-2xl border border-bucket-border bg-bucket-muted px-4"
+                    onPress={() => handleOAuth("oauth_apple")}
+                  >
+                    <View>
+                      {isDark ? (
+                        <AppleLogoWhite width={16} height={16} />
+                      ) : (
+                        <AppleLogoBlack width={16} height={16} />
+                      )}
                     </View>
-                    <Text className="text-base font-semibold text-bucket-foreground">
+                    <Text className="text-lg mt-0.5 font-semibold text-bucket-foreground">
                       Apple
                     </Text>
                   </Pressable>
