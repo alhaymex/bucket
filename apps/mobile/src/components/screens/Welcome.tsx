@@ -7,13 +7,13 @@ const Welcome = () => {
   const router = useRouter();
 
   return (
-    <SafeAreaView className="flex-1 bg-white dark:bg-stone-950">
+    <SafeAreaView className="flex-1 bg-bucket-background">
       <View className="flex-1 px-6 py-12">
         <View className="flex-1 items-center justify-center">
-          <Text className="px-8 text-center text-3xl font-bold leading-7 text-stone-300">
+          <Text className="px-8 text-center text-3xl font-bold leading-7 text-bucket-foreground">
             Welcome to Bucket!
           </Text>
-          <Text className="px-8 text-center text-base leading-7 text-stone-300">
+          <Text className="px-8 text-center text-base leading-7 text-bucket-muted-foreground">
             Save and organize your links
           </Text>
         </View>
@@ -21,26 +21,32 @@ const Welcome = () => {
         <View className="gap-3 pb-2">
           <Pressable
             onPress={() => router.push("/(auth)/sign-in")}
-            className="h-14 items-center justify-center rounded-2xl bg-white"
+            className="h-14 items-center justify-center rounded-2xl bg-bucket-primary"
           >
-            <Text className="text-base font-semibold text-stone-950">
+            <Text className="text-base font-semibold text-bucket-primary-foreground">
               Sign in
             </Text>
           </Pressable>
 
           <Pressable
             onPress={() => router.push("/(auth)/sign-up")}
-            className="h-14 items-center justify-center rounded-2xl border border-white/15 bg-white/5"
+            className="h-14 items-center justify-center rounded-2xl border border-bucket-border bg-bucket-card"
           >
-            <Text className="text-base font-semibold text-white">Sign up</Text>
+            <Text className="text-base font-semibold text-bucket-card-foreground">
+              Sign up
+            </Text>
           </Pressable>
         </View>
-        <View className="flex-row justify-between px-3 mt-6">
+        <View className="mt-6 flex-row justify-between px-3">
           <Pressable onPress={() => router.push("/(app)")}>
-            <Text className="text-base font-semibold text-white">Language</Text>
+            <Text className="text-base font-semibold text-bucket-muted-foreground">
+              Language
+            </Text>
           </Pressable>
           <Pressable onPress={() => router.push("/(app)")}>
-            <Text className="text-base font-semibold text-white">Theme</Text>
+            <Text className="text-base font-semibold text-bucket-muted-foreground">
+              Theme
+            </Text>
           </Pressable>
         </View>
       </View>

@@ -1,3 +1,65 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+  --background: #ffffff;
+  --foreground: #2c2c2a;
+  --card: #ffffff;
+  --card-foreground: #2c2c2a;
+  --muted: #f1efe8;
+  --muted-foreground: #5f5e5a;
+
+  --border: #d3d1c7;
+  --border-strong: #b4b2a9;
+
+  --primary: #7f77dd;
+  --primary-foreground: #3c3489;
+  --primary-subtle: #eeedfe;
+
+  --accent: #1d9e75;
+  --accent-foreground: #085041;
+
+  --pinned: #1d9e75;
+  --archived: #b4b2a9;
+  --pending: #fac775;
+  --dead: #f09595;
+
+  --type-youtube: #f5c4b3;
+  --type-article: #b5d4f4;
+  --type-product: #c0dd97;
+  --type-tweet: #cecbf6;
+  --type-github: #d3d1c7;
+  --type-generic: #f4c0d1;
+}
+
+.dark:root {
+  --background: #1a1918;
+  --foreground: #f1efe8;
+  --card: #2c2c2a;
+  --card-foreground: #f1efe8;
+  --muted: #232220;
+  --muted-foreground: #b4b2a9;
+
+  --border: #2c2c2a;
+  --border-strong: #444441;
+
+  --primary: #afa9ec;
+  --primary-foreground: #cecbf6;
+  --primary-subtle: #26215c;
+
+  --accent: #5dcaa5;
+  --accent-foreground: #9fe1cb;
+
+  --pinned: #5dcaa5;
+  --archived: #444441;
+  --pending: #ef9f27;
+  --dead: #e24b4a;
+
+  --type-youtube: #4a1b0c;
+  --type-article: #042c53;
+  --type-product: #173404;
+  --type-tweet: #26215c;
+  --type-github: #2c2c2a;
+  --type-generic: #4b1528;
+}
