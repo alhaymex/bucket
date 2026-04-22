@@ -11,4 +11,9 @@ config.resolver.assetExts = config.resolver.assetExts.filter(
 );
 config.resolver.sourceExts = [...config.resolver.sourceExts, "svg"];
 
-module.exports = withNativeWind(config, { input: "./src/styles/global.css" });
+module.exports = withNativeWind(config, {
+  input: "./src/styles/global.css",
+  // Work around a Metro 0.83.x + react-native-css-interop 0.2.3
+  // watcher crash by disabling virtual-module style fast refresh.
+  // forceWriteFileSystem: true,
+});

@@ -4,6 +4,7 @@ import { ArrowRight, Mail } from "lucide-react-native";
 import { useRouter } from "expo-router";
 import { useColorScheme } from "nativewind";
 import {
+  ActivityIndicator,
   Alert,
   Keyboard,
   KeyboardAvoidingView,
@@ -21,6 +22,11 @@ import AppleLogoWhite from "@/assets/images/logos/apple-white.svg";
 import GoogleLogo from "@/assets/images/logos/google.svg";
 import { useSignUp, useSSO } from "@clerk/expo";
 import { useState } from "react";
+import { email } from "zod";
+
+type AuthAction = "oauth_google" | "oauth_apple" | "email" | null;
+
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export const SignUpScreen = () => {
   const router = useRouter();
@@ -28,14 +34,18 @@ export const SignUpScreen = () => {
   const { signUp } = useSignUp();
   const setAuthFlowEmail = useAuthFlowStore((state) => state.setEmail);
 
+  const [activeAction, setActiveAction] = useState<AuthAction>(null);
+  const loading = activeAction !== null;
+
   const [email, setEmail] = useState("");
-  const [loading, setLoading] = useState(false);
 
   const token = useColors();
   const { colorScheme } = useColorScheme();
   const isDark = colorScheme === "dark";
 
   const handleOAuth = async (strategy: "oauth_google" | "oauth_apple") => {
+    setActiveAction(strategy);
+
     try {
       const { createdSessionId, setActive } = await startSSOFlow({
         strategy,
@@ -50,18 +60,20 @@ export const SignUpScreen = () => {
         "Unable to sign in with the selected provider.",
       );
       console.error("OAuth Sign-In Error:", error);
+    } finally {
+      setActiveAction(null);
     }
   };
 
   const handleEmailSignUp = async () => {
-    setLoading(true);
-
     const trimmedEmail = email.trim();
-    if (!trimmedEmail) {
+
+    if (!EMAIL_REGEX.test(trimmedEmail)) {
       Alert.alert("Invalid Email", "Please enter a valid email address.");
-      setLoading(false);
       return;
     }
+
+    setActiveAction("email");
 
     try {
       const { error } = await signUp.create({ emailAddress: trimmedEmail });
@@ -78,7 +90,7 @@ export const SignUpScreen = () => {
       );
       console.error("Email Sign-Up Error:", error);
     } finally {
-      setLoading(false);
+      setActiveAction(null);
     }
   };
 
@@ -118,14 +130,20 @@ export const SignUpScreen = () => {
                 </View>
 
                 <Pressable
-                  className="h-14 flex-row items-center justify-center gap-2 rounded-2xl bg-bucket-primary px-4"
+                  className="h-14 flex-row disabled:opacity-50 items-center justify-center gap-2 rounded-2xl bg-bucket-primary px-4"
                   onPress={() => handleEmailSignUp()}
                   disabled={loading}
                 >
-                  <Text className="font-semibold text-bucket-primary-foreground">
-                    Continue
-                  </Text>
-                  <ArrowRight size={18} color={token.primaryForeground} />
+                  {loading && activeAction === "email" ? (
+                    <ActivityIndicator color={token.primaryForeground} />
+                  ) : (
+                    <>
+                      <Text className="font-semibold text-bucket-primary-foreground">
+                        Continue
+                      </Text>
+                      <ArrowRight size={18} color={token.primaryForeground} />
+                    </>
+                  )}
                 </Pressable>
 
                 <View className="flex-row items-center gap-4 py-2">
@@ -137,7 +155,11 @@ export const SignUpScreen = () => {
                 </View>
 
                 <View className="flex-row gap-3">
-                  <Pressable className="h-14 flex-1 flex-row items-center justify-center gap-2 rounded-2xl border border-bucket-border bg-bucket-muted px-4">
+                  <Pressable
+                    className="h-14 flex-1 flex-row disabled:opacity-50 items-center justify-center gap-2 rounded-2xl border border-bucket-border bg-bucket-muted px-4"
+                    onPress={() => handleOAuth("oauth_google")}
+                    disabled={loading && activeAction === "oauth_google"}
+                  >
                     <View>
                       <GoogleLogo width={16} height={16} />
                     </View>
@@ -147,8 +169,9 @@ export const SignUpScreen = () => {
                   </Pressable>
 
                   <Pressable
-                    className="h-14 flex-1 flex-row items-center justify-center gap-2 rounded-2xl border border-bucket-border bg-bucket-muted px-4"
+                    className="h-14 flex-1 flex-row disabled:opacity-50 items-center justify-center gap-2 rounded-2xl border border-bucket-border bg-bucket-muted px-4"
                     onPress={() => handleOAuth("oauth_apple")}
+                    disabled={loading && activeAction === "oauth_apple"}
                   >
                     <View>
                       {isDark ? (
@@ -177,4 +200,3 @@ export const SignUpScreen = () => {
     </SafeAreaView>
   );
 };
-
