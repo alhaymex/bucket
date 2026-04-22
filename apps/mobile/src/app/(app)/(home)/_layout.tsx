@@ -1,7 +1,8 @@
+import { View, Text, Alert } from "react-native";
+import React from "react";
 import { Stack } from "expo-router";
-import { Alert } from "react-native";
 
-export default function SearchLayout() {
+const HomeLayout = () => {
   return (
     <Stack
       screenOptions={{
@@ -13,8 +14,7 @@ export default function SearchLayout() {
       <Stack.Screen
         name="index"
         options={{
-          presentation: "modal",
-          title: "Search",
+          title: "Home",
           unstable_headerRightItems: () => [
             {
               type: "button",
@@ -36,7 +36,7 @@ export default function SearchLayout() {
                 name: "person.fill",
               },
               onPress() {
-                Alert.alert("Add button pressed");
+                Alert.alert("Profile button pressed");
               },
               variant: "plain",
               sharesBackground: false,
@@ -46,4 +46,6 @@ export default function SearchLayout() {
       />
     </Stack>
   );
-}
+};
+
+export default HomeLayout;

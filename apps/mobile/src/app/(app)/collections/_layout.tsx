@@ -1,7 +1,8 @@
 import { Stack } from "expo-router";
+import React from "react";
 import { Alert } from "react-native";
 
-export default function SearchLayout() {
+export default function CollectionsLayout() {
   return (
     <Stack
       screenOptions={{
@@ -13,8 +14,7 @@ export default function SearchLayout() {
       <Stack.Screen
         name="index"
         options={{
-          presentation: "modal",
-          title: "Search",
+          title: "Settings",
           unstable_headerRightItems: () => [
             {
               type: "button",
@@ -27,6 +27,7 @@ export default function SearchLayout() {
                 Alert.alert("Add button pressed");
               },
               variant: "plain",
+              sharesBackground: false,
             },
             {
               type: "button",
@@ -39,7 +40,6 @@ export default function SearchLayout() {
                 Alert.alert("Add button pressed");
               },
               variant: "plain",
-              sharesBackground: false,
             },
           ],
         }}

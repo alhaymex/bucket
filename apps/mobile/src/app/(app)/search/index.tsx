@@ -1,16 +1,14 @@
-import { ScrollView } from "react-native";
-import { Stack } from "expo-router";
+import { Stack, useIsFocused } from "expo-router";
+import { ActivityIndicator, ScrollView, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-export default function SearchIndex() {
+export default function Search() {
   return (
     <>
-      <Stack.Screen.Title>Search</Stack.Screen.Title>
-      <Stack.SearchBar
-        placement="automatic"
-        placeholder="Search"
-        onChangeText={() => {}}
-      />
-      <ScrollView>{/* Screen content */}</ScrollView>
+      <Stack.SearchBar placement="automatic" placeholder="Search" />
+      <SafeAreaView className="flex-1 bg-bucket-background">
+        <ScrollView></ScrollView>
+      </SafeAreaView>
     </>
   );
 }
