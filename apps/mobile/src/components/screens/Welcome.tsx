@@ -50,7 +50,7 @@ const Welcome = () => {
 
         <View className="mt-6 flex-row justify-between px-3">
           <Pressable
-            onPress={() => router.push("/(app)")}
+            onPress={() => router.push("/")}
             className="flex-row items-center gap-2"
           >
             <Globe size={16} color={token.mutedForeground} />
@@ -59,7 +59,7 @@ const Welcome = () => {
             </Text>
           </Pressable>
           <Pressable
-            onPress={() => router.push("/(app)")}
+            onPress={() => router.push("/")}
             className="flex-row items-center gap-2"
           >
             <Sun size={16} color={token.mutedForeground} />
