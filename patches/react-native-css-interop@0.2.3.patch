@@ -1,8 +1,8 @@
 diff --git a/dist/metro/index.js b/dist/metro/index.js
-index c91ba6adf049dd5c6eec1ec8301ecc0802f41bfc..e775ea2dea5dd7bdafa72d81748d400a2c88798b 100644
+index c91ba6a..61ea5c2 100644
 --- a/dist/metro/index.js
 +++ b/dist/metro/index.js
-@@ -177,17 +177,25 @@ async function startCSSProcessor(filePath, platform, isDev, { input, getCSSForPl
+@@ -177,17 +177,20 @@ async function startCSSProcessor(filePath, platform, isDev, { input, getCSSForPl
                  : getNativeJS((0, css_to_rn_1.cssToReactNativeRuntime)(css, options), debug)));
              debug(`virtualStyles.emit ${platform}`);
              haste.emit("change", {
@@ -34,11 +34,18 @@ index c91ba6adf049dd5c6eec1ec8301ecc0802f41bfc..e775ea2dea5dd7bdafa72d81748d400a
              });
          }).then((css) => {
              debug(`virtualStyles.initial ${platform}`);
+@@ -277,4 +280,4 @@ function stringify(data) {
+         }
+     }
+ }
+-//# sourceMappingURL=index.js.map
+\ No newline at end of file
++//# sourceMappingURL=index.js.map
 diff --git a/src/metro/index.ts b/src/metro/index.ts
-index fa58c7b84bfb0e72d6f1100097bdc2c7030358f6..66c65be37367814e3614c40730204b0be357b31c 100644
+index fa58c7b..9ad0147 100644
 --- a/src/metro/index.ts
 +++ b/src/metro/index.ts
-@@ -342,17 +342,25 @@ async function startCSSProcessor(
+@@ -342,17 +342,20 @@ async function startCSSProcessor(
  
          debug(`virtualStyles.emit ${platform}`);
          haste.emit("change", {

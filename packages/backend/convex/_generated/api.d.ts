@@ -9,6 +9,7 @@
  */
 
 import type * as http from "../http.js";
+import type * as links from "../links.js";
 import type * as users from "../users.js";
 import type * as utils_clerk from "../utils/clerk.js";
 
@@ -20,6 +21,7 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   http: typeof http;
+  links: typeof links;
   users: typeof users;
   "utils/clerk": typeof utils_clerk;
 }>;

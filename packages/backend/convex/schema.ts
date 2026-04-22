@@ -24,6 +24,8 @@ export default defineSchema({
     collectionId: v.optional(v.id("collections")),
     url: v.string(),
 
+    note: v.optional(v.string()),
+
     contentType: v.union(
       v.literal("youtube"),
       v.literal("article"),

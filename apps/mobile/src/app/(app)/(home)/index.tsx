@@ -1,9 +1,7 @@
-import React from "react";
-import { Text, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { HomeScreen } from "@/components/screens/HomeScreen";
 
-const Index = () => {
-  return <SafeAreaView className="flex-1 bg-bucket-background"></SafeAreaView>;
+const HomeRoute = () => {
+  return <HomeScreen />;
 };
 
-export default Index;
+export default HomeRoute;
