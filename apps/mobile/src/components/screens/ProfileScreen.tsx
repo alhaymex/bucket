@@ -1,27 +1,19 @@
 import { useColors } from "@/hooks/useColors";
+import { useAuth } from "@clerk/expo";
 import { useRouter } from "expo-router";
 import {
   Bell,
   ChevronRight,
-  FolderOpen,
-  Link2,
   LogOut,
   Mail,
   MoonStar,
   Shield,
-  Tag,
   UserRound,
-  X,
+  X
 } from "lucide-react-native";
 import React from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-
-const PROFILE_STATS = [
-  { label: "Saved", value: "148", icon: Link2 },
-  { label: "Collections", value: "12", icon: FolderOpen },
-  { label: "Tags", value: "34", icon: Tag },
-] as const;
 
 const SETTINGS_GROUPS = [
   {
@@ -65,8 +57,10 @@ export const ProfileScreen = () => {
   const token = useColors();
   const router = useRouter();
 
+  const { signOut } = useAuth();
+
   return (
-    <SafeAreaView className="flex-1 bg-bucket-background" edges={["bottom"]}>
+    <SafeAreaView className="flex-1 bg-bucket-background " edges={["bottom"]}>
       <View className="flex-row items-center justify-between px-6 py-4">
         <Pressable
           onPress={() => router.back()}
@@ -87,33 +81,6 @@ export const ProfileScreen = () => {
         contentContainerClassName="gap-6 px-6 py-6"
         showsVerticalScrollIndicator={false}
       >
-        <View className="gap-3">
-          <View className="flex-row gap-3">
-            {PROFILE_STATS.map((stat) => {
-              const Icon = stat.icon;
-
-              return (
-                <View
-                  key={stat.label}
-                  className="flex-1 gap-3 rounded-2xl border border-bucket-border bg-bucket-muted p-2"
-                >
-                  <View className="h-9 w-9 items-center justify-center rounded-full bg-bucket-primary-subtle">
-                    <Icon size={16} color={token.primary} />
-                  </View>
-                  <View className="gap-1">
-                    <Text className="text-xl font-bold text-bucket-foreground">
-                      {stat.value}
-                    </Text>
-                    <Text className="text-sm text-bucket-muted-foreground">
-                      {stat.label}
-                    </Text>
-                  </View>
-                </View>
-              );
-            })}
-          </View>
-        </View>
-
         {SETTINGS_GROUPS.map((group) => (
           <View key={group.title} className="gap-3">
             <View className="flex-row items-center gap-2">
@@ -153,7 +120,10 @@ export const ProfileScreen = () => {
           </View>
         ))}
 
-        <Pressable className="flex-row items-center justify-center gap-2 rounded-2xl border border-bucket-border bg-bucket-muted px-4 py-4">
+        <Pressable
+          className="flex-row items-center justify-center gap-2 rounded-2xl border border-bucket-border bg-bucket-muted px-4 py-4"
+          onPress={() => signOut()}
+        >
           <LogOut size={16} color={token.dead} />
           <Text className="text-sm font-semibold text-bucket-dead">
             Sign out
