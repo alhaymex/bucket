@@ -1,4 +1,4 @@
-import SignUpScreen from "@/components/screens/SignUpScreen";
+import { SignUpScreen } from "@/components/screens/SignUpScreen";
 
 const SignUp = () => {
   return <SignUpScreen />;

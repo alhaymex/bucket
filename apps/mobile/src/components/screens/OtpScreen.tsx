@@ -19,7 +19,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 const OTP_LENGTH = 6;
 
-const OtpScreen = ({ email }: { email: string }) => {
+export const OtpScreen = ({ email }: { email: string }) => {
   const router = useRouter();
   const tokens = useColors();
   const { signUp } = useSignUp();
@@ -186,5 +186,3 @@ const OtpScreen = ({ email }: { email: string }) => {
     </SafeAreaView>
   );
 };
-
-export default OtpScreen;

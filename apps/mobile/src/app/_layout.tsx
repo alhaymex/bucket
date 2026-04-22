@@ -13,14 +13,13 @@ const Routes = () => {
         <Stack.Screen name="(app)" />
         <Stack.Screen
           name="add"
-          options={{ presentation: "modal", headerShown: true, title: "Add" }}
+          options={{ presentation: "modal", headerShown: false }}
         />
         <Stack.Screen
           name="profile"
           options={{
             presentation: "modal",
-            headerShown: true,
-            title: "Profile",
+            headerShown: false,
           }}
         />
       </Stack.Protected>

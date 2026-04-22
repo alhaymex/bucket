@@ -1,4 +1,4 @@
-import OtpScreen from "@/components/screens/OtpScreen";
+import { OtpScreen } from "@/components/screens/OtpScreen";
 import { useAuthFlowStore } from "@/store/authFlowStore";
 import { useRouter } from "expo-router";
 import { useEffect } from "react";

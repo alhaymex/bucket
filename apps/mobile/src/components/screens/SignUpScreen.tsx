@@ -22,7 +22,7 @@ import GoogleLogo from "@/assets/images/logos/google.svg";
 import { useSignUp, useSSO } from "@clerk/expo";
 import { useState } from "react";
 
-const SignUpScreen = () => {
+export const SignUpScreen = () => {
   const router = useRouter();
   const { startSSOFlow } = useSSO();
   const { signUp } = useSignUp();
@@ -178,4 +178,3 @@ const SignUpScreen = () => {
   );
 };
 
-export default SignUpScreen;
