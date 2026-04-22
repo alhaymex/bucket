@@ -1,7 +1,6 @@
 import { useColors } from "@/hooks/useColors";
-import { NativeTabs } from "expo-router/build/native-tabs";
+import { NativeTabs } from "expo-router/unstable-native-tabs";
 import React from "react";
-import { Alert } from "react-native";
 
 export default function AppLayout() {
   const tokens = useColors();
