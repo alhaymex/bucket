@@ -54,14 +54,14 @@ export default defineSchema({
     .index("by_user", ["userId"])
     .index("by_collection", ["collectionId"])
     .index("by_user_type", ["userId", "contentType"])
-    .searchIndex("search_bookmarks", {
+    .searchIndex("search_links", {
       searchField: "title",
       filterFields: ["userId", "contentType", "tags"],
     }),
 
   // Links Previews
   youtube_previews: defineTable({
-    bookmarkId: v.id("links"),
+    linkId: v.id("links"),
     videoId: v.string(),
     channelId: v.string(),
     channelName: v.string(),
@@ -71,10 +71,10 @@ export default defineSchema({
     viewCount: v.optional(v.number()),
     likeCount: v.optional(v.number()),
     publishedAt: v.optional(v.number()),
-  }).index("by_bookmark", ["bookmarkId"]),
+  }).index("by_link", ["linkId"]),
 
   article_previews: defineTable({
-    bookmarkId: v.id("links"),
+    linkId: v.id("links"),
     author: v.optional(v.string()),
     siteName: v.optional(v.string()),
     publisherLogoUrl: v.optional(v.string()),
@@ -84,11 +84,11 @@ export default defineSchema({
     articlePublishedAt: v.optional(v.number()),
     language: v.optional(v.string()),
     images: v.array(v.string()),
-  }).index("by_bookmark", ["bookmarkId"]),
+  }).index("by_link", ["linkId"]),
 
   // Products from platforms like Amazon, Etsy, etc.
   product_previews: defineTable({
-    bookmarkId: v.id("links"),
+    linkId: v.id("links"),
     storeName: v.string(),
     storeLogoUrl: v.optional(v.string()),
     productId: v.string(),
@@ -105,21 +105,21 @@ export default defineSchema({
     ratingCount: v.optional(v.number()),
     brand: v.optional(v.string()),
     images: v.array(v.string()),
-  }).index("by_bookmark", ["bookmarkId"]),
+  }).index("by_link", ["linkId"]),
 
   // X is a wierd variable name
   tweet_previews: defineTable({
-    bookmarkId: v.id("bookmarks"),
+    linkId: v.id("links"),
     tweetId: v.string(),
     tweetText: v.string(),
     embedHtml: v.optional(v.string()),
     authorName: v.string(),
     authorUsername: v.string(),
     tweetedAt: v.number(),
-  }).index("by_bookmark", ["bookmarkId"]),
+  }).index("by_link", ["linkId"]),
 
   github_previews: defineTable({
-    bookmarkId: v.id("bookmarks"),
+    linkId: v.id("links"),
     repoOwner: v.string(),
     repoName: v.string(),
     description: v.optional(v.string()),
@@ -131,10 +131,10 @@ export default defineSchema({
     license: v.optional(v.string()),
     topics: v.array(v.string()),
     lastCommitAt: v.optional(v.number()),
-  }).index("by_bookmark", ["bookmarkId"]),
+  }).index("by_link", ["linkId"]),
 
   link_check_jobs: defineTable({
-    bookmarkId: v.id("bookmarks"),
+    linkId: v.id("links"),
     status: v.union(
       v.literal("queued"),
       v.literal("alive"),
@@ -146,6 +146,6 @@ export default defineSchema({
     checkedAt: v.optional(v.number()),
     nextCheckAt: v.number(),
   })
-    .index("by_bookmark", ["bookmarkId"])
+    .index("by_link", ["linkId"])
     .index("by_next_check", ["nextCheckAt"]),
 });
