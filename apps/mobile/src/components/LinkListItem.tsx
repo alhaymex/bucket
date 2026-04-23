@@ -1,5 +1,12 @@
 import { useColors } from "@/hooks/useColors";
-import { Ellipsis, File } from "lucide-react-native";
+import { timeAgo } from "@/lib/date";
+import {
+  FileText,
+  Play,
+  ShoppingBag,
+  Code,
+  Newspaper,
+} from "lucide-react-native";
 import React from "react";
 import { Pressable, Text, View } from "react-native";
 
@@ -8,55 +15,78 @@ type LinkType = "article" | "youtube-video" | "github-repo" | "product";
 type LinkListItemProps = {
   title: string;
   type: LinkType;
+  source: string;
   timestamp: number;
-  detail: string;
+  onPress?: () => void;
+};
+
+const typeLabelMap: Record<LinkType, string> = {
+  article: "Article",
+  "youtube-video": "Video",
+  "github-repo": "Repo",
+  product: "Product",
+};
+
+const getTypeIcon = (type: LinkType, color: string) => {
+  switch (type) {
+    case "article":
+      return <Newspaper size={18} color={color} />;
+    case "youtube-video":
+      return <Play size={18} color={color} />;
+    case "github-repo":
+      return <Code size={18} color={color} />;
+    case "product":
+      return <ShoppingBag size={18} color={color} />;
+    default:
+      return <FileText size={18} color={color} />;
+  }
 };
 
 export const LinkListItem = ({
   title,
   type,
+  source,
   timestamp,
-  detail,
+  onPress,
 }: LinkListItemProps) => {
   const token = useColors();
 
   return (
-    <Pressable className="flex-row items-center gap-4 py-4 active:opacity-70">
-      <View className="w-10 h-10 shrink-0 items-center justify-center">
-        <File size={22} color={token.mutedForeground || "#666"} />
+    <Pressable
+      onPress={onPress}
+      className="flex-row items-start gap-3 px-4 py-3 active:opacity-70"
+    >
+      <View className="h-10 w-10 items-center justify-center rounded-2xl bg-bucket-secondary shrink-0">
+        {getTypeIcon(type, token.mutedForeground || "#666")}
       </View>
 
       <View className="flex-1 min-w-0">
-        <View className="flex-row items-center justify-between gap-2">
-          <Text
-            className="text-base font-medium text-bucket-foreground flex-1"
-            numberOfLines={1}
-          >
-            {title}
+        <Text
+          numberOfLines={1}
+          className="text-[15px] leading-5 font-medium text-bucket-foreground"
+        >
+          {title}
+        </Text>
+
+        <View className="mt-1.5 flex-row items-center gap-2 min-w-0">
+          <Text className="text-[11px] font-medium text-bucket-muted-foreground uppercase tracking-wide">
+            {typeLabelMap[type]}
           </Text>
-        </View>
 
-        <View className="flex-row items-center justify-between mt-0.5">
-          <View className="flex-row items-center gap-1.5 flex-1 pr-2 min-w-0">
-            <Text className="text-xs text-green-500 font-bold rounded-md p-0.5 px-2">
-              {Math.floor(Math.random() * 100)}%
-            </Text>
-            <Text className="text-xs text-bucket-foreground bg-bucket-border rounded-md p-0.5 px-2">{type}</Text>
+          {source ? (
+            <>
+              <Text className="text-xs text-bucket-muted-foreground">•</Text>
+              <Text
+                numberOfLines={1}
+                className="flex-1 text-sm text-bucket-muted-foreground"
+              >
+                {source}
+              </Text>
+            </>
+          ) : null}
 
-            {detail && (
-              <>
-                <Text className="text-xs text-bucket-muted-foreground">•</Text>
-                <Text
-                  className="text-xs text-bucket-muted-foreground flex-1"
-                  numberOfLines={1}
-                >
-                  {detail}
-                </Text>
-              </>
-            )}
-          </View>
-          <Text className="text-xs text-bucket-muted-foreground shrink-0">
-            2 mins ago
+          <Text className="text-sm text-bucket-muted-foreground shrink-0">
+            {timeAgo(timestamp)}
           </Text>
         </View>
       </View>

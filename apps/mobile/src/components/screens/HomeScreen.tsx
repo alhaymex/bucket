@@ -7,44 +7,45 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 const CONTINUE_LINKS: {
   title: string;
+  type: "article" | "youtube-video" | "github-repo" | "product";
   source: string;
-  meta: string;
-  detail?: string;
+  timestamp: number;
 }[] = [
   {
     title: "Why products need sharper onboarding loops",
     source: "Linear Blog",
-    meta: "12m ago",
-    detail: "8 min read",
+    type: "article",
+    timestamp: 1776889980049,
   },
   {
     title: "Reanimated 3 — gesture & layout examples",
     source: "youtube.com",
-    meta: "1h ago",
-    detail: "24:13",
+    timestamp: 1776889927213,
+    type: "youtube-video",
   },
   {
     title: "software-mansion/react-native-screens",
     source: "github.com",
-    meta: "3h ago",
-    detail: "12.4k ★",
+    type: "github-repo",
+    timestamp: 1776889960621,
   },
   {
     title: "The fastest way to build a useful reading queue",
     source: "Personal blog",
-    meta: "Yesterday",
-    detail: "5 min read",
+    type: "article",
+    timestamp: 1776889971931,
   },
   {
     title: "Notion just shipped a native mobile editor",
-    source: "@notionhq",
-    meta: "2d ago",
+    source: "notion",
+    timestamp: 1776889913317,
+    type: "article",
   },
   {
     title: "Kindle Scribe — 2nd Gen",
     source: "amazon.com",
-    meta: "2d ago",
-    detail: "$339",
+    timestamp: 1776889905578,
+    type: "product",
   },
 ];
 
@@ -94,13 +95,13 @@ export const HomeScreen = () => {
           </Text>
 
           <View className="gap-2">
-            {CONTINUE_LINKS.map((link) => (
+            {CONTINUE_LINKS.map((link, i) => (
               <LinkListItem
-                key={`${link.title}-${link.meta}`}
+                key={i}
                 title={link.title}
-                type="article"
-                timestamp={123}
-                detail={""}
+                type={link.type}
+                timestamp={link.timestamp}
+                source={link.source}
               />
             ))}
           </View>
