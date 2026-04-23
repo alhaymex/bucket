@@ -1,6 +1,8 @@
 import { useColors } from "@/hooks/useColors";
 import { cn } from "@/lib/utils";
 import {
+  Archive,
+  Bookmark,
   BookOpen,
   Briefcase,
   Clapperboard,
@@ -8,6 +10,7 @@ import {
   Dumbbell,
   Gamepad2,
   Globe,
+  Inbox,
   Lightbulb,
   LucideIcon,
   Microscope,
@@ -16,6 +19,7 @@ import {
   Palette,
   Shapes,
   Sprout,
+  Star,
   UtensilsCrossed,
   Wrench,
 } from "lucide-react-native";
@@ -37,6 +41,10 @@ export const collectionIconMap = {
   Microscope,
   DollarSign,
   Sprout,
+  Archive,
+  Inbox,
+  Star,
+  Bookmark
 } satisfies Record<string, LucideIcon>;
 
 export type CollectionIconName = keyof typeof collectionIconMap;

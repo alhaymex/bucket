@@ -1,7 +1,5 @@
 import { CollectionsScreen } from "@/components/screens/CollectionsScreen";
 
-const CollectionsRoute = () => {
+export default function CollectionsRoute() {
   return <CollectionsScreen />;
-};
-
-export default CollectionsRoute;
+}

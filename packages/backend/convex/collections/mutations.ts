@@ -19,6 +19,7 @@ export const createCollection = mutation({
       userId: user._id,
       name: args.name,
       slug: collectionSlug,
+      description: args.description,
       icon: args.icon,
       type: "user",
       sortOrder: 0,

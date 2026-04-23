@@ -5,7 +5,7 @@ import {
   useTabRootScreenOptions,
 } from "@/navigation/tabHeader";
 
-const HomeLayout = () => {
+export default function HomeLayout() {
   const options = useTabRootScreenOptions("Home");
 
   return (
@@ -13,6 +13,4 @@ const HomeLayout = () => {
       <Stack.Screen name="index" options={options} />
     </Stack>
   );
-};
-
-export default HomeLayout;
+}

@@ -1,5 +1,7 @@
 import { useColors } from "@/hooks/useColors";
 import { cn } from "@/lib/utils";
+import { api } from "@bucket/backend";
+import { useQuery } from "convex/react";
 import { useRouter } from "expo-router";
 import {
   ArrowUpRight,
@@ -14,6 +16,7 @@ import {
 import React from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { collectionIconMap, CollectionIconName } from "../IconSelector";
 
 const SMART_COLLECTIONS = [
   { label: "All links", value: "128", icon: Layers3 },
@@ -45,6 +48,10 @@ const COLLECTIONS = [
 export const CollectionsScreen = () => {
   const token = useColors();
   const router = useRouter();
+  const collections = useQuery(api.collections.queries.getUserCollections);
+
+  const systemCollections = collections?.filter((c) => c.type === "system");
+  const userCollections = collections?.filter((c) => c.type === "user");
 
   return (
     <SafeAreaView className="flex-1 bg-bucket-background" edges={["bottom"]}>
@@ -55,31 +62,39 @@ export const CollectionsScreen = () => {
       >
         <View className="gap-3">
           <Text className="text-xs font-semibold uppercase tracking-[1.4px] text-bucket-muted-foreground">
-            Smart views
+            Default Collections
           </Text>
 
           <View className="rounded-2xl border border-bucket-border bg-bucket-muted overflow-hidden">
-            {SMART_COLLECTIONS.map((item, i) => {
-              const Icon = item.icon;
-              const isLast = i === SMART_COLLECTIONS.length - 1;
-              return (
-                <View key={item.label}>
-                  <Pressable className="flex-row items-center gap-3 px-4 py-3.5">
-                    <View className="h-9 w-9 items-center justify-center rounded-xl bg-bucket-background">
-                      <Icon size={16} color={token.foreground} />
-                    </View>
-                    <Text className="flex-1 text-sm font-medium text-bucket-foreground">
-                      {item.label}
-                    </Text>
-                    <Text className="text-sm font-semibold text-bucket-muted-foreground">
-                      {item.value}
-                    </Text>
-                    <ArrowUpRight size={14} color={token.mutedForeground} />
-                  </Pressable>
-                  {!isLast && <View className="ml-16 h-px bg-bucket-border" />}
-                </View>
-              );
-            })}
+            {systemCollections === undefined ? (
+              <Text className="px-4 py-3.5 text-sm text-bucket-muted-foreground">
+                Loading...
+                {/* TODO: show a skeleton */}
+              </Text>
+            ) : (
+              systemCollections.map((item, i) => {
+                const Icon = item.icon
+                  ? collectionIconMap[item.icon as CollectionIconName]
+                  : Layers3;
+                const isLast = i === systemCollections.length - 1;
+                return (
+                  <View key={item._id}>
+                    <Pressable className="flex-row items-center gap-3 px-4 py-3.5">
+                      <View className="h-9 w-9 items-center justify-center rounded-md ">
+                        <Icon size={16} color={token.foreground} />
+                      </View>
+                      <Text className="flex-1 text-sm font-medium text-bucket-foreground">
+                        {item.name}
+                      </Text>
+                      <ArrowUpRight size={14} color={token.mutedForeground} />
+                    </Pressable>
+                    {!isLast && (
+                      <View className="ml-16 h-px bg-bucket-border" />
+                    )}
+                  </View>
+                );
+              })
+            )}
           </View>
         </View>
 
@@ -101,39 +116,38 @@ export const CollectionsScreen = () => {
           </View>
 
           <View className="rounded-2xl border border-bucket-border bg-bucket-muted overflow-hidden">
-            {COLLECTIONS.map((collection, i) => {
-              const Icon = collection.icon;
-              const isLast = i === COLLECTIONS.length - 1;
-              return (
-                <View key={collection.name}>
-                  <Pressable className="flex-row items-center gap-3 px-4 py-3.5">
-                    <View
-                      className={cn(
-                        "h-9 w-9 items-center justify-center rounded-xl",
-                        collection.accent
-                          ? "bg-bucket-primary-subtle"
-                          : "bg-bucket-background",
-                      )}
-                    >
-                      <Icon
-                        size={16}
-                        color={
-                          collection.accent ? token.primary : token.foreground
-                        }
-                      />
-                    </View>
-                    <Text className="flex-1 text-sm font-medium text-bucket-foreground">
-                      {collection.name}
-                    </Text>
-                    <Text className="text-sm text-bucket-muted-foreground">
-                      {collection.count}
-                    </Text>
-                    <ArrowUpRight size={14} color={token.mutedForeground} />
-                  </Pressable>
-                  {!isLast && <View className="ml-16 h-px bg-bucket-border" />}
-                </View>
-              );
-            })}
+            {userCollections === undefined ? (
+              <Text className="px-4 py-3.5 text-sm text-bucket-muted-foreground">
+                Loading...
+              </Text>
+            ) : userCollections.length === 0 ? (
+              <Text className="px-4 py-3.5 text-sm text-bucket-muted-foreground">
+                No collections yet
+              </Text>
+            ) : (
+              userCollections.map((collection, i) => {
+                const Icon = collection.icon
+                  ? collectionIconMap[collection.icon as CollectionIconName]
+                  : Layers3;
+                const isLast = i === userCollections.length - 1;
+                return (
+                  <View key={collection._id}>
+                    <Pressable className="flex-row items-center gap-3 px-4 py-3.5">
+                      <View className="h-9 w-9 items-center justify-center rounded-xl bg-bucket-background">
+                        <Icon size={16} color={token.foreground} />
+                      </View>
+                      <Text className="flex-1 text-sm font-medium text-bucket-foreground">
+                        {collection.name}
+                      </Text>
+                      <ArrowUpRight size={14} color={token.mutedForeground} />
+                    </Pressable>
+                    {!isLast && (
+                      <View className="ml-16 h-px bg-bucket-border" />
+                    )}
+                  </View>
+                );
+              })
+            )}
           </View>
         </View>
       </ScrollView>
