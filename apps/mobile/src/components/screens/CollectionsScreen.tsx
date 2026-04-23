@@ -1,4 +1,5 @@
 import { useColors } from "@/hooks/useColors";
+import { cn } from "@/lib/utils";
 import { useRouter } from "expo-router";
 import {
   ArrowUpRight,
@@ -107,11 +108,12 @@ export const CollectionsScreen = () => {
                 <View key={collection.name}>
                   <Pressable className="flex-row items-center gap-3 px-4 py-3.5">
                     <View
-                      className={`h-9 w-9 items-center justify-center rounded-xl ${
+                      className={cn(
+                        "h-9 w-9 items-center justify-center rounded-xl",
                         collection.accent
                           ? "bg-bucket-primary-subtle"
-                          : "bg-bucket-background"
-                      }`}
+                          : "bg-bucket-background",
+                      )}
                     >
                       <Icon
                         size={16}

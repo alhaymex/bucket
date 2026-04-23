@@ -1,8 +1,9 @@
 import { useQuery } from "convex/react";
 import { FlatList, Pressable, Text, View } from "react-native";
 import { api } from "@bucket/backend";
+import { cn } from "@/lib/utils";
 interface CollectionSelectorProps {
-  selected: string | undefined;
+  selected: string;
   onSelect: (collectionId: string) => void;
 }
 
@@ -26,16 +27,18 @@ export const CollectionSelector = ({
           return (
             <Pressable
               onPress={() => onSelect(item._id)}
-              className={`border-[0.2px] rounded-full px-4 py-2 mx-1 ${
+              className={cn(
+                "border-[0.2px] rounded-full px-4 py-2 mx-1",
                 isActive
                   ? "border-bucket-primary bg-bucket-primary-subtle"
-                  : "bg-bucket-muted"
-              }`}
+                  : "bg-bucket-muted",
+              )}
             >
               <Text
-                className={`text-sm font-medium ${
-                  isActive ? "text-bucket-primary" : "text-bucket-foreground"
-                }`}
+                className={cn(
+                  "text-sm font-medium",
+                  isActive ? "text-bucket-primary" : "text-bucket-foreground",
+                )}
               >
                 {item.name}
               </Text>

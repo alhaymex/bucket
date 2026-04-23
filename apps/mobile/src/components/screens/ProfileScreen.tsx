@@ -1,4 +1,5 @@
 import { useColors } from "@/hooks/useColors";
+import { cn } from "@/lib/utils";
 import { useAuth } from "@clerk/expo";
 import { useRouter } from "expo-router";
 import {
@@ -9,7 +10,7 @@ import {
   MoonStar,
   Shield,
   UserRound,
-  X
+  X,
 } from "lucide-react-native";
 import React from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
@@ -97,9 +98,10 @@ export const ProfileScreen = () => {
                 return (
                   <Pressable
                     key={item.label}
-                    className={`flex-row items-center gap-3 px-4 py-4 ${
-                      !isLast ? "border-b border-bucket-border" : ""
-                    }`}
+                    className={cn(
+                      "flex-row items-center gap-3 px-4 py-4",
+                      !isLast ? "border-b border-bucket-border" : "",
+                    )}
                   >
                     <View className="h-10 w-10 items-center justify-center rounded-full bg-bucket-background">
                       <Icon size={16} color={token.foreground} />

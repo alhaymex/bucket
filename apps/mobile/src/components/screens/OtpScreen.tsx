@@ -1,4 +1,5 @@
 import { useColors } from "@/hooks/useColors";
+import { cn } from "@/lib/utils";
 import { useAuthFlowStore } from "@/store/authFlowStore";
 import { useSignUp } from "@clerk/expo";
 import { useRouter } from "expo-router";
@@ -147,9 +148,10 @@ export const OtpScreen = ({ email }: { email: string }) => {
 
                 <Pressable
                   disabled={!isComplete || loading}
-                  className={`flex-row gap-2 h-14 items-center justify-center rounded-2xl bg-bucket-primary px-4 ${
-                    !isComplete || loading ? "opacity-40" : ""
-                  }`}
+                  className={cn(
+                    "flex-row gap-2 h-14 items-center justify-center rounded-2xl bg-bucket-primary px-4 ",
+                    !isComplete || loading ? "opacity-40" : "",
+                  )}
                   onPress={() => handleCodeSubmit(code)}
                 >
                   {loading && <ActivityIndicator color="white" />}

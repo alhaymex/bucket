@@ -1,6 +1,6 @@
 import { View, Text, TextInput, Pressable, ScrollView } from "react-native";
 import { Controller, useForm } from "react-hook-form";
-import { AddLinkSchema, type AddLinkType } from "@bucket/common";
+import type { AddLinkType } from "@bucket/common";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AlignLeft, Clipboard, Link, X } from "lucide-react-native";
 import { useColors } from "@/hooks/useColors";
