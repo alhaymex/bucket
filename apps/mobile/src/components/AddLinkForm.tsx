@@ -18,6 +18,7 @@ export const AddLinkForm = () => {
   const {
     control,
     setValue,
+    handleSubmit,
     formState: { isValid, isDirty },
   } = useForm<AddLinkType>({
     resolver: zodResolver(AddLinkSchema),
@@ -45,6 +46,11 @@ export const AddLinkForm = () => {
     checkClipboard();
   }, []);
 
+  const submitForm = (form: AddLinkType) => {
+    // TODO:
+    console.log(form);
+  };
+
   return (
     <View className="flex-1">
       <View className="flex-row items-center justify-between px-6 py-4">
@@ -60,6 +66,7 @@ export const AddLinkForm = () => {
         <Pressable
           disabled={!isValid || !isDirty}
           className="rounded-full bg-bucket-primary px-4 py-2 disabled:opacity-40"
+          onPress={handleSubmit(submitForm)}
         >
           <Text className="text-sm font-semibold text-bucket-primary-foreground">
             Save
@@ -150,8 +157,8 @@ export const AddLinkForm = () => {
             <CollectionSelector
               onSelect={(id) => {
                 setValue("collectionId", id, {
-                  shouldDirty: true,
-                  shouldTouch: true,
+                  shouldDirty: value.length > 0,
+                  shouldTouch: value.length > 0,
                   shouldValidate: true,
                 });
               }}

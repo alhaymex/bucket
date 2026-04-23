@@ -1,6 +1,16 @@
 import { z } from "zod";
 
-export const urlSchema = z.url();
+export const urlSchema = z
+  .string()
+  .transform((val) => {
+    const trimmed = val.trim();
+    return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+  })
+  .pipe(
+    z
+      .string()
+      .regex(/^https?:\/\/([\w-]+\.)+[\w-]+(\/[\w-./?%&=]*)?$/i, "Invalid URL"),
+  );
 
 export const AddLinkSchema = z.object({
   link: urlSchema,

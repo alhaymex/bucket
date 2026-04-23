@@ -11,13 +11,16 @@ export default defineSchema({
 
   collections: defineTable({
     userId: v.id("users"),
-    parentId: v.optional(v.id("collections")),
     name: v.string(),
+    slug: v.string(),
     description: v.optional(v.string()),
     icon: v.optional(v.string()),
     color: v.optional(v.string()),
     sortOrder: v.number(),
-  }).index("by_user", ["userId"]),
+    type: v.union(v.literal("system"), v.literal("user")),
+  })
+    .index("by_user", ["userId"])
+    .index("by_user_and_slug", ["userId", "slug"]),
 
   links: defineTable({
     userId: v.id("users"),

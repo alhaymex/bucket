@@ -1,4 +1,4 @@
-import { MutationCtx, query, QueryCtx } from "./_generated/server";
+import { MutationCtx, QueryCtx } from "./_generated/server";
 
 export const getCurrentUserFromCtx = async (ctx: QueryCtx | MutationCtx) => {
   const identity = await ctx.auth.getUserIdentity();
@@ -15,10 +15,3 @@ export const getCurrentUserFromCtx = async (ctx: QueryCtx | MutationCtx) => {
 
   return user;
 };
-
-export const getCurrentUser = query({
-  args: {},
-  handler: async (ctx) => {
-    return await getCurrentUserFromCtx(ctx);
-  },
-});

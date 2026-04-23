@@ -1,6 +1,7 @@
 import { internalMutation, type MutationCtx } from "./_generated/server";
 import { v } from "convex/values";
 import type { Id } from "./_generated/dataModel";
+import { ensureSystemCollections } from "./collections";
 
 export const deleteFromClerk = internalMutation({
   args: { clerkId: v.string() },
@@ -71,6 +72,8 @@ export const upsertFromClerk = internalMutation({
     if (!canonicalUser) {
       const userId = await ctx.db.insert("users", patch);
 
+      await ensureSystemCollections(ctx, userId);
+
       return {
         action: "created" as const,
         duplicateCountRemoved: 0,
@@ -84,6 +87,8 @@ export const upsertFromClerk = internalMutation({
       await reassignUserReferences(ctx, duplicateUser._id, canonicalUser._id);
       await ctx.db.delete("users", duplicateUser._id);
     }
+
+    await ensureSystemCollections(ctx, canonicalUser._id);
 
     return {
       action: "updated" as const,
