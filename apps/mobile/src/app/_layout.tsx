@@ -16,6 +16,10 @@ const Routes = () => {
           options={{ presentation: "modal", headerShown: false }}
         />
         <Stack.Screen
+          name="create-collection"
+          options={{ presentation: "modal", headerShown: false }}
+        />
+        <Stack.Screen
           name="profile"
           options={{
             presentation: "modal",

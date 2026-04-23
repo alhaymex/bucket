@@ -21,6 +21,8 @@ export const saveLink = mutation({
 
     // TODO: handle if no collectionId
 
+    // TODO: handle auto detect content type
+
     await ctx.db.insert("links", {
       userId: user._id,
       url: args.url,

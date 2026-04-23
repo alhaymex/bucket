@@ -1,14 +1,16 @@
-import React from "react";
 import {
-  Keyboard,
+  View,
+  Text,
   KeyboardAvoidingView,
   Platform,
   TouchableWithoutFeedback,
+  Keyboard,
 } from "react-native";
+import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { AddLinkForm } from "../AddLinkForm";
+import { CreateCollectionForm } from "../CreateCollectionForm";
 
-export const AddLinkScreen = () => {
+export const CreateCollectionScreen = () => {
   return (
     <SafeAreaView className="flex-1 bg-bucket-background" edges={["bottom"]}>
       <KeyboardAvoidingView
@@ -16,7 +18,7 @@ export const AddLinkScreen = () => {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <AddLinkForm />
+          <CreateCollectionForm />
         </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
     </SafeAreaView>

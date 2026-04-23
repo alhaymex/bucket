@@ -13,6 +13,7 @@ import { TagInput } from "./TagInput";
 import { useMutation } from "convex/react";
 import { api, Id } from "@bucket/backend";
 import { ConvexAddLinkSchema } from "@/schema/linkSchema";
+import { FormHeader } from "./FormHeader";
 
 export const AddLinkForm = () => {
   const token = useColors();
@@ -64,29 +65,13 @@ export const AddLinkForm = () => {
 
   return (
     <View className="flex-1">
-      <View className="flex-row items-center justify-between px-6 py-4">
-        <Pressable
-          onPress={() => router.back()}
-          className="h-9 w-9 items-center justify-center rounded-full bg-bucket-muted"
-        >
-          <X size={16} color={token.foreground} />
-        </Pressable>
-        <Text className="text-base font-semibold text-bucket-foreground">
-          Add link
-        </Text>
-        <Pressable
-          disabled={!isValid || !isDirty}
-          className="rounded-full bg-bucket-primary px-4 py-2 disabled:opacity-40"
-          onPress={handleSubmit(submitForm)}
-        >
-          <Text className="text-sm font-semibold text-bucket-primary-foreground">
-            Save
-          </Text>
-        </Pressable>
-      </View>
-
-      <View className="h-px bg-bucket-border" />
-
+      <FormHeader
+        title="Add Link"
+        actionTitle="Save"
+        onClose={() => router.back()}
+        onSave={handleSubmit(submitForm)}
+        canSave={isValid && isDirty}
+      />
       <ScrollView
         className="flex-1"
         contentContainerClassName="px-6 py-6 gap-6"

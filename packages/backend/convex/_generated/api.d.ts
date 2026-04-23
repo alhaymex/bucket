@@ -10,6 +10,7 @@
 
 import type * as auth from "../auth.js";
 import type * as collections_index from "../collections/index.js";
+import type * as collections_mutations from "../collections/mutations.js";
 import type * as collections_queries from "../collections/queries.js";
 import type * as http from "../http.js";
 import type * as links_mutations from "../links/mutations.js";
@@ -25,6 +26,7 @@ import type {
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   "collections/index": typeof collections_index;
+  "collections/mutations": typeof collections_mutations;
   "collections/queries": typeof collections_queries;
   http: typeof http;
   "links/mutations": typeof links_mutations;

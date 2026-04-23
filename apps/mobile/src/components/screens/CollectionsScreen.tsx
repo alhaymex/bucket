@@ -1,4 +1,5 @@
 import { useColors } from "@/hooks/useColors";
+import { useRouter } from "expo-router";
 import {
   ArrowUpRight,
   BookOpen,
@@ -42,6 +43,7 @@ const COLLECTIONS = [
 
 export const CollectionsScreen = () => {
   const token = useColors();
+  const router = useRouter();
 
   return (
     <SafeAreaView className="flex-1 bg-bucket-background" edges={["bottom"]}>
@@ -50,18 +52,6 @@ export const CollectionsScreen = () => {
         contentContainerClassName="gap-8 px-5 py-6"
         showsVerticalScrollIndicator={false}
       >
-        <View className="flex-row items-center justify-between">
-          <Text className="text-2xl font-bold text-bucket-foreground">
-            Collections
-          </Text>
-          <Pressable className="flex-row items-center gap-1.5 rounded-full bg-bucket-primary-subtle px-4 py-2">
-            <Plus size={13} color={token.primary} />
-            <Text className="text-sm font-semibold text-bucket-primary">
-              New
-            </Text>
-          </Pressable>
-        </View>
-
         <View className="gap-3">
           <Text className="text-xs font-semibold uppercase tracking-[1.4px] text-bucket-muted-foreground">
             Smart views
@@ -93,9 +83,21 @@ export const CollectionsScreen = () => {
         </View>
 
         <View className="gap-3">
-          <Text className="text-xs font-semibold uppercase tracking-[1.4px] text-bucket-muted-foreground">
-            Your collections
-          </Text>
+          <View className="flex-row items-center justify-between">
+            <Text className="text-xs font-semibold uppercase tracking-[1.4px] text-bucket-muted-foreground">
+              Your collections
+            </Text>
+
+            <Pressable
+              className="flex-row items-center gap-1.5 rounded-full bg-bucket-primary-subtle px-4 py-2 active:opacity-40"
+              onPress={() => router.push("/create-collection")}
+            >
+              <Plus size={13} color={token.primary} />
+              <Text className="text-sm font-semibold text-bucket-primary">
+                New
+              </Text>
+            </Pressable>
+          </View>
 
           <View className="rounded-2xl border border-bucket-border bg-bucket-muted overflow-hidden">
             {COLLECTIONS.map((collection, i) => {
