@@ -7,10 +7,10 @@
   --foreground: #2c2c2a;
   --card: #ffffff;
   --card-foreground: #2c2c2a;
-  --muted: #f1efe8;
+  --muted: #f4f4f3;
   --muted-foreground: #5f5e5a;
 
-  --border: #d3d1c7;
+  --border: #e4e4e2;
   --border-strong: #b4b2a9;
 
   --primary: #7f77dd;
@@ -32,6 +32,7 @@
   --type-github: #d3d1c7;
   --type-generic: #f4c0d1;
 }
+
 
 .dark:root {
   --background: #1a1918;

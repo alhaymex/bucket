@@ -14,6 +14,8 @@ export const createCollection = mutation({
     if (!user) throw new Error("Unauthorized!");
 
     const collectionSlug = slugify(args.name);
+    
+    // TODO: make sure the icon is the correct type
 
     await ctx.db.insert("collections", {
       userId: user._id,

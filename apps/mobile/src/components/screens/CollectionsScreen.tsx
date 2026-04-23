@@ -1,49 +1,30 @@
 import { useColors } from "@/hooks/useColors";
-import { cn } from "@/lib/utils";
 import { api } from "@bucket/backend";
 import { useQuery } from "convex/react";
 import { useRouter } from "expo-router";
-import {
-  ArrowUpRight,
-  BookOpen,
-  Inbox,
-  Layers3,
-  Lightbulb,
-  Plus,
-  Sparkles,
-  Video,
-} from "lucide-react-native";
+import { ArrowUpRight, GripVertical, Layers3, Plus } from "lucide-react-native";
 import React from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { collectionIconMap, CollectionIconName } from "../IconSelector";
 
-const SMART_COLLECTIONS = [
-  { label: "All links", value: "128", icon: Layers3 },
-  { label: "Inbox", value: "24", icon: Inbox },
-  { label: "Ready to sort", value: "9", icon: Sparkles },
-] as const;
+// TODO: use flatlist
+// Add dragging
 
-const COLLECTIONS = [
-  {
-    name: "Reading list",
-    count: "42 links",
-    icon: BookOpen,
-    accent: true,
-  },
-  {
-    name: "Product ideas",
-    count: "18 links",
-    icon: Lightbulb,
-    accent: false,
-  },
-  {
-    name: "Videos",
-    count: "11 links",
-    icon: Video,
-    accent: false,
-  },
-] as const;
+const CollectionSkeleton = ({ count = 3 }: { count?: number }) => (
+  <>
+    {Array.from({ length: count }).map((_, i) => (
+      <View key={i}>
+        <View className="flex-row items-center gap-3 px-4 py-3.5">
+          <View className="h-9 w-9 rounded-md bg-bucket-border animate-pulse" />
+          <View className="h-4 flex-1 rounded bg-bucket-border animate-pulse" />
+          <View className="h-4 w-4 rounded bg-bucket-border animate-pulse" />
+        </View>
+        {i < count - 1 && <View className="ml-16 h-px bg-bucket-border" />}
+      </View>
+    ))}
+  </>
+);
 
 export const CollectionsScreen = () => {
   const token = useColors();
@@ -52,6 +33,8 @@ export const CollectionsScreen = () => {
 
   const systemCollections = collections?.filter((c) => c.type === "system");
   const userCollections = collections?.filter((c) => c.type === "user");
+
+  const isLoading = collections === undefined;
 
   return (
     <SafeAreaView className="flex-1 bg-bucket-background" edges={["bottom"]}>
@@ -66,13 +49,10 @@ export const CollectionsScreen = () => {
           </Text>
 
           <View className="rounded-2xl border border-bucket-border bg-bucket-muted overflow-hidden">
-            {systemCollections === undefined ? (
-              <Text className="px-4 py-3.5 text-sm text-bucket-muted-foreground">
-                Loading...
-                {/* TODO: show a skeleton */}
-              </Text>
+            {isLoading ? (
+              <CollectionSkeleton count={3} />
             ) : (
-              systemCollections.map((item, i) => {
+              systemCollections?.map((item, i) => {
                 const Icon = item.icon
                   ? collectionIconMap[item.icon as CollectionIconName]
                   : Layers3;
@@ -116,31 +96,40 @@ export const CollectionsScreen = () => {
           </View>
 
           <View className="rounded-2xl border border-bucket-border bg-bucket-muted overflow-hidden">
-            {userCollections === undefined ? (
-              <Text className="px-4 py-3.5 text-sm text-bucket-muted-foreground">
-                Loading...
-              </Text>
-            ) : userCollections.length === 0 ? (
-              <Text className="px-4 py-3.5 text-sm text-bucket-muted-foreground">
+            {isLoading ? (
+              <CollectionSkeleton count={4} />
+            ) : userCollections?.length === 0 ? (
+              <Text className="px-4 py-3.5 text-sm text-center text-bucket-muted-foreground">
                 No collections yet
               </Text>
             ) : (
-              userCollections.map((collection, i) => {
+              userCollections?.map((collection, i) => {
                 const Icon = collection.icon
                   ? collectionIconMap[collection.icon as CollectionIconName]
                   : Layers3;
                 const isLast = i === userCollections.length - 1;
                 return (
                   <View key={collection._id}>
-                    <Pressable className="flex-row items-center gap-3 px-4 py-3.5">
-                      <View className="h-9 w-9 items-center justify-center rounded-xl bg-bucket-background">
-                        <Icon size={16} color={token.foreground} />
+                    <View className="flex-row items-center px-4">
+                      <View className="py-3.5 pr-3">
+                        <GripVertical color={token.mutedForeground} size={16} />
                       </View>
-                      <Text className="flex-1 text-sm font-medium text-bucket-foreground">
-                        {collection.name}
-                      </Text>
-                      <ArrowUpRight size={14} color={token.mutedForeground} />
-                    </Pressable>
+
+                      <Pressable className="flex-1 flex-row items-center gap-3 py-3.5">
+                        <View className="h-9 w-9 items-center justify-center">
+                          <Icon size={16} color={token.foreground} />
+                        </View>
+
+                        <Text
+                          className="flex-1 text-sm font-medium text-bucket-foreground"
+                          numberOfLines={1}
+                        >
+                          {collection.name}
+                        </Text>
+
+                        <ArrowUpRight size={14} color={token.mutedForeground} />
+                      </Pressable>
+                    </View>
                     {!isLast && (
                       <View className="ml-16 h-px bg-bucket-border" />
                     )}

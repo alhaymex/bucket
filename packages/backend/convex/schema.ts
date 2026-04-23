@@ -15,7 +15,6 @@ export default defineSchema({
     slug: v.string(),
     description: v.optional(v.string()),
     icon: v.optional(v.string()),
-    color: v.optional(v.string()),
     sortOrder: v.number(),
     type: v.union(v.literal("system"), v.literal("user")),
   })

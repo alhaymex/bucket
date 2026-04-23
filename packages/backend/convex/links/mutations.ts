@@ -19,9 +19,18 @@ export const saveLink = mutation({
 
     if (!isUrl(args.url)) throw new Error("Invalid Url!");
 
-    // TODO: handle if no collectionId
+    const existingCollection = await ctx.db
+      .query("collections")
+      .withIndex("by_id", (q) => q.eq("_id", args.collectionId))
+      .collect();
+
+    if (!existingCollection) throw new Error("No collection found!");
 
     // TODO: handle auto detect content type
+
+    // TODO: handle duplicate links
+
+    // TODO: start a background job to get the url metadata
 
     await ctx.db.insert("links", {
       userId: user._id,

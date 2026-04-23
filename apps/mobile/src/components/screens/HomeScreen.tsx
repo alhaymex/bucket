@@ -61,8 +61,8 @@ export const HomeScreen = () => {
       >
         <View className="rounded-2xl border border-bucket-border bg-bucket-muted overflow-hidden">
           <Pressable className="flex-row items-center gap-3 px-4 py-3.5">
-            <View className="h-9 w-9 items-center justify-center rounded-xl bg-bucket-primary-subtle">
-              <Inbox size={16} color={token.primary} />
+            <View className="h-9 w-9 items-center justify-center">
+              <Inbox size={16} color={token.foreground} />
             </View>
             <Text className="flex-1 text-sm font-medium text-bucket-foreground">
               Inbox
@@ -76,7 +76,7 @@ export const HomeScreen = () => {
           <View className="ml-16 h-px bg-bucket-border" />
 
           <Pressable className="flex-row items-center gap-3 px-4 py-3.5">
-            <View className="h-9 w-9 items-center justify-center rounded-xl bg-bucket-background">
+            <View className="h-9 w-9 items-center justify-center">
               <Sparkles size={16} color={token.foreground} />
             </View>
             <Text className="flex-1 text-sm font-medium text-bucket-foreground">
