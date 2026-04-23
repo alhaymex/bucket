@@ -12,7 +12,7 @@ import type * as auth from "../auth.js";
 import type * as collections_index from "../collections/index.js";
 import type * as collections_queries from "../collections/queries.js";
 import type * as http from "../http.js";
-import type * as links from "../links.js";
+import type * as links_mutations from "../links/mutations.js";
 import type * as users from "../users.js";
 import type * as utils_clerk from "../utils/clerk.js";
 
@@ -27,7 +27,7 @@ declare const fullApi: ApiFromModules<{
   "collections/index": typeof collections_index;
   "collections/queries": typeof collections_queries;
   http: typeof http;
-  links: typeof links;
+  "links/mutations": typeof links_mutations;
   users: typeof users;
   "utils/clerk": typeof utils_clerk;
 }>;

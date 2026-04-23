@@ -45,8 +45,8 @@ export default defineSchema({
     thumbnailUrl: v.optional(v.string()),
 
     tags: v.array(v.string()),
-    isPinned: v.boolean(),
-    isArchived: v.boolean(),
+    isPinned: v.optional(v.boolean()),
+    isArchived: v.optional(v.boolean()),
 
     status: v.union(
       v.literal("pending"),

@@ -1,0 +1,15 @@
+{
+  "name": "@bucket/common",
+  "version": "0.0.0",
+  "private": "true",
+  "description": "Common types / utility functions",
+  "exports": {
+    ".": "./index.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "zod": "^4.3.6"
+  }
+}

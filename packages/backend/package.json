@@ -17,6 +17,7 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@bucket/common": "workspace:*",
     "@convex-dev/eslint-plugin": "^1.2.2",
     "@eslint/eslintrc": "^3.3.5",
     "@eslint/js": "^9.39.4",

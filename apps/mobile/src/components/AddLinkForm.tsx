@@ -1,29 +1,34 @@
 import { View, Text, TextInput, Pressable, ScrollView } from "react-native";
 import { Controller, useForm } from "react-hook-form";
-import { AddLinkSchema, type AddLinkType } from "@/schema/LinkSchema";
+import { AddLinkSchema, type AddLinkType } from "@bucket/common";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AlignLeft, Clipboard, Link, X } from "lucide-react-native";
 import { useColors } from "@/hooks/useColors";
 import { useEffect, useState } from "react";
 import * as ExpoClipboard from "expo-clipboard";
-import { isUrl } from "@/lib/url";
+import { isUrl } from "@bucket/common";
 import { useRouter } from "expo-router";
 import { CollectionSelector } from "./CollectionSelector";
 import { TagInput } from "./TagInput";
+import { useMutation } from "convex/react";
+import { api, Id } from "@bucket/backend";
+import { ConvexAddLinkSchema } from "@/schema/linkSchema";
 
 export const AddLinkForm = () => {
   const token = useColors();
   const router = useRouter();
+  const addLinkMutation = useMutation(api.links.mutations.saveLink);
 
   const {
     control,
     setValue,
     handleSubmit,
+    reset,
     formState: { isValid, isDirty },
   } = useForm<AddLinkType>({
-    resolver: zodResolver(AddLinkSchema),
+    resolver: zodResolver(ConvexAddLinkSchema),
     defaultValues: {
-      link: "",
+      url: "",
       note: "",
       collectionId: "",
       tags: [],
@@ -47,8 +52,14 @@ export const AddLinkForm = () => {
   }, []);
 
   const submitForm = (form: AddLinkType) => {
-    // TODO:
-    console.log(form);
+    addLinkMutation({
+      collectionId: form.collectionId as Id<"collections">,
+      url: form.url,
+      tags: form.tags,
+      note: form.note,
+    });
+
+    reset();
   };
 
   return (
@@ -83,7 +94,7 @@ export const AddLinkForm = () => {
       >
         <Controller
           control={control}
-          name="link"
+          name="url"
           render={({ field: { onChange, value } }) => (
             <View className="gap-2">
               <View className="flex-row items-center gap-2">
@@ -107,7 +118,7 @@ export const AddLinkForm = () => {
                 {clipboardUrl && (
                   <Pressable
                     onPress={() => {
-                      setValue("link", clipboardUrl, {
+                      setValue("url", clipboardUrl, {
                         shouldDirty: true,
                         shouldTouch: true,
                         shouldValidate: true,

@@ -13,7 +13,7 @@ export const urlSchema = z
   );
 
 export const AddLinkSchema = z.object({
-  link: urlSchema,
+  url: urlSchema,
   note: z.string().optional(),
   collectionId: z.string(),
   tags: z.array(z.string()),
