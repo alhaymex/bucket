@@ -1,8 +1,9 @@
 import { ViewLinkScreen } from "@/components/screens/ViewLinkScreen";
+import { Id } from "@bucket/backend";
 import { useLocalSearchParams } from "expo-router";
 
 export default function View() {
   const { linkId } = useLocalSearchParams<{ linkId: string }>();
 
-  return <ViewLinkScreen linkId={linkId} />;
+  return <ViewLinkScreen linkId={linkId as Id<"links">} />;
 }

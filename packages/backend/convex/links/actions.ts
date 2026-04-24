@@ -9,6 +9,38 @@ import { sanitizeArticleHtml } from "../utils/html";
 const toOptionalString = (value: string | null | undefined) =>
   value ?? undefined;
 
+const escapeRegex = (value: string) =>
+  value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+const normalizeTitle = ({
+  title,
+  siteName,
+}: {
+  title: string | null | undefined;
+  siteName: string | null | undefined;
+}) => {
+  if (!title) return undefined;
+
+  let normalizedTitle = title.trim();
+  const normalizedSiteName = siteName?.trim();
+
+  if (!normalizedSiteName) return normalizedTitle || undefined;
+
+  const duplicatedSiteSuffix = new RegExp(
+    `\\s*[\\-–|:]\\s*${escapeRegex(normalizedSiteName)}(?:\\s*[\\-–|:]\\s*${escapeRegex(normalizedSiteName)})+$`,
+    "i",
+  );
+  const siteSuffix = new RegExp(
+    `\\s*[\\-–|:]\\s*${escapeRegex(normalizedSiteName)}$`,
+    "i",
+  );
+
+  normalizedTitle = normalizedTitle.replace(duplicatedSiteSuffix, "");
+  normalizedTitle = normalizedTitle.replace(siteSuffix, "");
+
+  return normalizedTitle.trim() || undefined;
+};
+
 export const getOpenGraph = internalAction({
   args: { linkId: v.id("links") },
   handler: async (ctx, { linkId }) => {
@@ -48,6 +80,11 @@ export const getOpenGraph = internalAction({
       const description = getMeta("og:description") || getMeta("description");
 
       const image = getMeta("og:image");
+      const siteName = getMeta("og:site_name") || article?.siteName;
+      const resolvedTitle = normalizeTitle({
+        title: article?.title || getMeta("og:title") || $("title").text(),
+        siteName,
+      });
 
       const favicon =
         $('link[rel="icon"]').attr("href") ||
@@ -55,19 +92,17 @@ export const getOpenGraph = internalAction({
 
       await ctx.runMutation(internal.links.mutations.updateLinkOpenGraph, {
         linkId: linkId,
-        title: toOptionalString(title || article?.title),
+        title: toOptionalString(resolvedTitle),
         description: toOptionalString(description || article?.excerpt),
         thumbnailUrl: toOptionalString(image),
         faviconUrl: favicon,
-        siteName: toOptionalString(
-          getMeta("og:site_name") || article?.siteName,
-        ),
+        siteName: toOptionalString(siteName),
         html: toOptionalString(sanitizedHtml),
       });
 
       console.log("[DEBUG] OpenGraph fetched for ", {
         linkId: linkId,
-        title: title || article?.title,
+        title: resolvedTitle,
         description: description || article?.excerpt,
         image,
         favicon,
