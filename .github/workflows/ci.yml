@@ -3,6 +3,7 @@ name: CI
 on:
   push:
     branches:
+      - preview
       - main
   pull_request:
 

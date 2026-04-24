@@ -11,12 +11,21 @@ on:
         options:
           - preview
           - production
-  push:
-    branches:
-      - main
+  workflow_run:
+    workflows: ["CI"]
+    types:
+      - completed
 
 jobs:
   eas-build:
+    if: >
+      github.event_name == 'workflow_dispatch' || (
+        github.event.workflow_run.conclusion == 'success' &&
+        (
+          github.event.workflow_run.head_branch == 'preview' ||
+          github.event.workflow_run.head_branch == 'main'
+        )
+      )
     runs-on: ubuntu-latest
     env:
       EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
@@ -56,6 +65,8 @@ jobs:
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             echo "value=${{ inputs.profile }}" >> "$GITHUB_OUTPUT"
+          elif [ "${{ github.event.workflow_run.head_branch }}" = "main" ]; then
+            echo "value=production" >> "$GITHUB_OUTPUT"
           else
             echo "value=preview" >> "$GITHUB_OUTPUT"
           fi
