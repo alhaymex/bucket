@@ -5,6 +5,10 @@ const envSchema = z.object({
     .enum(["development", "test", "production"])
     .default("development"),
   PORT: z.coerce.number().int().positive().default(3001),
+  EXTRACTOR_SHARED_SECRET: z.string().min(1),
+  PUPPETEER_TIMEOUT_MS: z.coerce.number().int().positive().default(30000),
+  PUPPETEER_MAX_CONCURRENCY: z.coerce.number().int().positive().default(2),
+  CHROME_PATH: z.string().min(1).optional(),
 });
 
 const parsed = envSchema.safeParse(process.env);

@@ -9,4 +9,13 @@ export {
   type CreateCollectionType,
 } from "./schema/collectionSchema";
 
+export {
+  ExtractorResponseStatusSchema,
+  ExtractArticleRequestSchema,
+  ExtractArticleResponseSchema,
+  type ExtractorResponseStatus,
+  type ExtractArticleRequest,
+  type ExtractArticleResponse,
+} from "./schema/extractorSchema";
+
 export { isUrl, slugify, normalizeUrl } from "./utils";
