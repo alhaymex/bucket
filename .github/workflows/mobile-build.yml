@@ -17,7 +17,6 @@ on:
 
 jobs:
   eas-build:
-    if: secrets.EXPO_TOKEN != ''
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -44,6 +43,13 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
         working-directory: .
+
+      - name: Validate Expo token
+        run: |
+          if [ -z "$EXPO_TOKEN" ]; then
+            echo "EXPO_TOKEN is not configured."
+            exit 1
+          fi
 
       - name: Setup Expo and EAS
         uses: expo/expo-github-action@v8
