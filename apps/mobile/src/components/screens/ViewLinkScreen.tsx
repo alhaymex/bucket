@@ -2,7 +2,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { ReaderHTML } from "../RenderHTML";
 import { api, Id } from "@bucket/backend";
 import { useQuery } from "convex/react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
 import { Skeleton } from "../ui/Skeleton";
 import { LinkScreenHeader } from "../LinkScreenHeader";
 

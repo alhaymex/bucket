@@ -44,7 +44,7 @@ export const collectionIconMap = {
   Archive,
   Inbox,
   Star,
-  Bookmark
+  Bookmark,
 } satisfies Record<string, LucideIcon>;
 
 export type CollectionIconName = keyof typeof collectionIconMap;

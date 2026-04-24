@@ -65,7 +65,9 @@ function TabHeaderActions({ onAdd, onProfile }: HeaderActionHandlers) {
         style={styles.actionButton}
       >
         <Plus color={colors.foreground} size={20} strokeWidth={2.25} />
-        <Text style={[styles.actionLabel, { color: colors.foreground }]}>Add</Text>
+        <Text style={[styles.actionLabel, { color: colors.foreground }]}>
+          Add
+        </Text>
       </Pressable>
       <Pressable
         accessibilityLabel="Profile"

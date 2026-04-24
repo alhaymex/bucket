@@ -169,22 +169,19 @@ export const handleOpenGraph = async (
             extractorResponse.textContent,
           );
 
-          await ctx.runMutation(
-            internal.links.mutations.updateLinkOpenGraph,
-            {
-              linkId: linkId,
-              title: toOptionalString(fallbackTitle),
-              description: toOptionalString(
-                extractorResponse.excerpt || description || article?.excerpt,
-              ),
-              thumbnailUrl: toOptionalString(image),
-              faviconUrl: favicon,
-              siteName: toOptionalString(fallbackSiteName),
-              html: toOptionalString(fallbackHtml),
-              text: toOptionalString(fallbackText),
-              readingTime: calculateReadingTimeMinutes(fallbackText),
-            },
-          );
+          await ctx.runMutation(internal.links.mutations.updateLinkOpenGraph, {
+            linkId: linkId,
+            title: toOptionalString(fallbackTitle),
+            description: toOptionalString(
+              extractorResponse.excerpt || description || article?.excerpt,
+            ),
+            thumbnailUrl: toOptionalString(image),
+            faviconUrl: favicon,
+            siteName: toOptionalString(fallbackSiteName),
+            html: toOptionalString(fallbackHtml),
+            text: toOptionalString(fallbackText),
+            readingTime: calculateReadingTimeMinutes(fallbackText),
+          });
 
           console.log("[DEBUG] Extractor fallback fetched for ", {
             linkId: linkId,

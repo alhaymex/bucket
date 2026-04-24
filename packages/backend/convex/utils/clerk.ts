@@ -64,10 +64,17 @@ export function getPrimaryEmail(user: ClerkUserWebhookData): string | null {
     (email) => email.id === user.primary_email_address_id,
   );
 
-  return primaryEmail?.email_address ?? user.email_addresses[0]?.email_address ?? null;
+  return (
+    primaryEmail?.email_address ??
+    user.email_addresses[0]?.email_address ??
+    null
+  );
 }
 
-export function getDisplayName(user: ClerkUserWebhookData, email: string): string {
+export function getDisplayName(
+  user: ClerkUserWebhookData,
+  email: string,
+): string {
   const fullName = [user.first_name, user.last_name]
     .filter((value): value is string => Boolean(value?.trim()))
     .join(" ")

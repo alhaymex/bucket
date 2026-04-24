@@ -8,6 +8,9 @@
     "start:android": "expo start --android",
     "start:ios": "expo start --ios",
     "lint": "expo lint",
+    "build:preview": "npx eas-cli build --platform all --profile preview --non-interactive --no-wait",
+    "build:production": "npx eas-cli build --platform all --profile production --non-interactive --no-wait",
+    "test": "node -e \"console.log('No tests defined for @bucket/mobile yet')\"",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -62,6 +65,7 @@
   "devDependencies": {
     "@types/react": "~19.2.2",
     "babel-preset-expo": "~55.0.8",
+    "eslint-config-expo": "^55.0.0",
     "prettier-plugin-tailwindcss": "^0.5.11",
     "react-native-svg-transformer": "^1.5.1",
     "tailwindcss": "^3.4.17",

@@ -7,6 +7,7 @@
     ".": "./index.ts"
   },
   "scripts": {
+    "test": "node -e \"console.log('No tests defined for @bucket/common yet')\"",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "keywords": [],

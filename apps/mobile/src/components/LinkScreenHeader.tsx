@@ -11,7 +11,10 @@ export const LinkScreenHeader = () => {
   return (
     <View>
       <View className="flex-row items-center justify-between px-6 py-4">
-        <Pressable className="h-9 w-9 items-center justify-center rounded-full bg-bucket-muted">
+        <Pressable
+          onPress={() => router.back()}
+          className="h-9 w-9 items-center justify-center rounded-full bg-bucket-muted"
+        >
           <X size={16} color={token.foreground} />
         </Pressable>
         <Text className="text-base font-semibold text-bucket-foreground">

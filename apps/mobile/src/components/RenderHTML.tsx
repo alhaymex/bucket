@@ -9,11 +9,7 @@ type ReaderWebViewProps = {
   canonicalUrl: string;
 };
 
-export function ReaderHTML({
-  title,
-  html,
-  canonicalUrl,
-}: ReaderWebViewProps) {
+export function ReaderHTML({ title, html, canonicalUrl }: ReaderWebViewProps) {
   const colors = useColors();
 
   const document = useMemo(() => {

@@ -100,12 +100,9 @@ describe("extractArticle", () => {
         timeout: 1234,
       },
     );
-    expect(page.waitForFunction).toHaveBeenCalledWith(
-      expect.any(Function),
-      {
-        timeout: 1234,
-      },
-    );
+    expect(page.waitForFunction).toHaveBeenCalledWith(expect.any(Function), {
+      timeout: 1234,
+    });
     expect(page.waitForNetworkIdle).toHaveBeenCalledWith({
       idleTime: 500,
       timeout: 1234,
@@ -136,12 +133,9 @@ describe("extractArticle", () => {
         timeout: 5000,
       },
     );
-    expect(page.waitForFunction).toHaveBeenCalledWith(
-      expect.any(Function),
-      {
-        timeout: 8000,
-      },
-    );
+    expect(page.waitForFunction).toHaveBeenCalledWith(expect.any(Function), {
+      timeout: 8000,
+    });
     expect(page.waitForNetworkIdle).toHaveBeenCalledWith({
       idleTime: 500,
       timeout: 8000,
