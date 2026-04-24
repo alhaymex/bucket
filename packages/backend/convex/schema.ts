@@ -44,8 +44,8 @@ export default defineSchema({
     thumbnailUrl: v.optional(v.string()),
 
     tags: v.array(v.string()),
-    isPinned: v.optional(v.boolean()),
-    isArchived: v.optional(v.boolean()),
+    isPinned: v.boolean(),
+    isArchived: v.boolean(),
 
     status: v.union(
       v.literal("pending"),
@@ -58,6 +58,8 @@ export default defineSchema({
     .index("by_user", ["userId"])
     .index("by_collection", ["collectionId"])
     .index("by_user_type", ["userId", "contentType"])
+    .index("by_user_last_viewed", ["userId", "lastViewedAt"])
+    .index("by_user_url", ["userId", "url"])
     .searchIndex("search_links", {
       searchField: "title",
       filterFields: ["userId", "contentType", "tags"],

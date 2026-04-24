@@ -9,4 +9,4 @@ export {
   type CreateCollectionType,
 } from "./schema/collectionSchema";
 
-export { isUrl, slugify } from "./utils";
+export { isUrl, slugify, normalizeUrl } from "./utils";

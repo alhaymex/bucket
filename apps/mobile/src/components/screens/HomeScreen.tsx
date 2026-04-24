@@ -1,5 +1,7 @@
 import { LinkListItem } from "@/components/LinkListItem";
 import { useColors } from "@/hooks/useColors";
+import { api } from "@bucket/backend";
+import { useQuery } from "convex/react";
 import { ArrowUpRight, Inbox, Sparkles } from "lucide-react-native";
 import React from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
@@ -51,6 +53,7 @@ const CONTINUE_LINKS: {
 
 export const HomeScreen = () => {
   const token = useColors();
+  const data = useQuery(api.links.queries.getUserRecentLinks);
 
   return (
     <SafeAreaView className="flex-1 bg-bucket-background" edges={["bottom"]}>
@@ -95,15 +98,19 @@ export const HomeScreen = () => {
           </Text>
 
           <View className="gap-2">
-            {CONTINUE_LINKS.map((link, i) => (
-              <LinkListItem
-                key={i}
-                title={link.title}
-                type={link.type}
-                timestamp={link.timestamp}
-                source={link.source}
-              />
-            ))}
+            {data &&
+              data.map((link, i) => (
+                <LinkListItem
+                  key={link._id}
+                  title={link.title}
+                  url={link.url}
+                  contentType={link.contentType}
+                  lastViewedAt={link.lastViewedAt!}
+                  onPress={() => {
+                    console.log(link.title);
+                  }}
+                />
+              ))}
           </View>
         </View>
       </ScrollView>

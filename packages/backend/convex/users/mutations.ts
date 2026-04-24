@@ -1,7 +1,7 @@
-import { internalMutation, type MutationCtx } from "./_generated/server";
+import { internalMutation, type MutationCtx } from "../_generated/server";
 import { v } from "convex/values";
-import type { Id } from "./_generated/dataModel";
-import { ensureSystemCollections } from "./collections";
+import type { Id } from "../_generated/dataModel";
+import { ensureSystemCollections } from "../collections";
 
 export const deleteFromClerk = internalMutation({
   args: { clerkId: v.string() },

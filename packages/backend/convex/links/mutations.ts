@@ -1,7 +1,7 @@
 import { v } from "convex/values";
 import { mutation } from "../_generated/server";
 import { getCurrentUserFromCtx } from "../auth";
-import { isUrl } from "@bucket/common";
+import { isUrl, normalizeUrl, urlSchema } from "@bucket/common";
 
 export const saveLink = mutation({
   args: {
@@ -17,28 +17,46 @@ export const saveLink = mutation({
       throw new Error("Not authenticated");
     }
 
-    if (!isUrl(args.url)) throw new Error("Invalid Url!");
+    const parsedUrl = urlSchema.safeParse(args.url);
 
-    const existingCollection = await ctx.db
-      .query("collections")
-      .withIndex("by_id", (q) => q.eq("_id", args.collectionId))
-      .collect();
+    if (!parsedUrl.success) throw new Error("Invalid Url!");
 
-    if (!existingCollection) throw new Error("No collection found!");
+    const normalizedUrl = normalizeUrl(parsedUrl.data);
 
-    // TODO: handle auto detect content type
+    const collection = await ctx.db.get(args.collectionId);
 
-    // TODO: handle duplicate links
+    if (!collection || collection.userId !== user._id)
+      throw new Error("No collection found!");
 
-    // TODO: start a background job to get the url metadata
+    const existingLink = await ctx.db
+      .query("links")
+      .withIndex("by_user_url", (q) =>
+        q.eq("userId", user._id).eq("url", normalizedUrl),
+      )
+      .unique();
 
-    await ctx.db.insert("links", {
+    if (existingLink) {
+      await ctx.db.patch("links", existingLink._id, {
+        lastViewedAt: Date.now(),
+      });
+
+      return existingLink._id;
+    }
+
+    const linkId = await ctx.db.insert("links", {
       userId: user._id,
       url: args.url,
       contentType: "article",
       status: "pending",
       tags: args.tags,
       collectionId: args.collectionId,
+      isPinned: false,
+      isArchived: false,
+      lastViewedAt: Date.now(),
     });
+
+    // TODO: start a background job to get the url metadata
+
+    return linkId;
   },
 });

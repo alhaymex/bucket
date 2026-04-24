@@ -94,7 +94,7 @@ export const clerkWebhook = httpAction(async (ctx, request) => {
     });
 
     try {
-      await ctx.runMutation(internal.users.deleteFromClerk, {
+      await ctx.runMutation(internal.users.mutations.deleteFromClerk, {
         clerkId: event.data.id,
       });
 
@@ -145,12 +145,15 @@ export const clerkWebhook = httpAction(async (ctx, request) => {
   });
 
   try {
-    const result = await ctx.runMutation(internal.users.upsertFromClerk, {
-      clerkId: event.data.id,
-      email,
-      name,
-      avatar: userData.image_url ?? undefined,
-    });
+    const result = await ctx.runMutation(
+      internal.users.mutations.upsertFromClerk,
+      {
+        clerkId: event.data.id,
+        email,
+        name,
+        avatar: userData.image_url ?? undefined,
+      },
+    );
 
     logClerkWebhook("user_upserted", {
       action: result.action,

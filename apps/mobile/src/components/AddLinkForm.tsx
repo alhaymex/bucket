@@ -53,7 +53,7 @@ export const AddLinkForm = () => {
   }, []);
 
   const submitForm = (form: AddLinkType) => {
-    addLinkMutation({
+    const linkId = addLinkMutation({
       collectionId: form.collectionId as Id<"collections">,
       url: form.url,
       tags: form.tags,
@@ -61,6 +61,8 @@ export const AddLinkForm = () => {
     });
 
     reset();
+
+    router.back();
   };
 
   return (

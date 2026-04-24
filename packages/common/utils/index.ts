@@ -12,3 +12,12 @@ export const slugify = (str: string): string => {
     .replace(/[\s_]+/g, "-")
     .replace(/^-+|-+$/g, "");
 };
+
+export const normalizeUrl = (url: string) => {
+  const parsed = new URL(url);
+
+  parsed.hash = "";
+  parsed.hostname = parsed.hostname.replace(/^www\./, "");
+
+  return parsed.toString();
+};

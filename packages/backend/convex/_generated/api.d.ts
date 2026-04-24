@@ -14,7 +14,8 @@ import type * as collections_mutations from "../collections/mutations.js";
 import type * as collections_queries from "../collections/queries.js";
 import type * as http from "../http.js";
 import type * as links_mutations from "../links/mutations.js";
-import type * as users from "../users.js";
+import type * as links_queries from "../links/queries.js";
+import type * as users_mutations from "../users/mutations.js";
 import type * as utils_clerk from "../utils/clerk.js";
 
 import type {
@@ -30,7 +31,8 @@ declare const fullApi: ApiFromModules<{
   "collections/queries": typeof collections_queries;
   http: typeof http;
   "links/mutations": typeof links_mutations;
-  users: typeof users;
+  "links/queries": typeof links_queries;
+  "users/mutations": typeof users_mutations;
   "utils/clerk": typeof utils_clerk;
 }>;
 
