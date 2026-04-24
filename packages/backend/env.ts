@@ -9,6 +9,7 @@ const envSchema = z.object({
   EXTRACTOR_SHARED_SECRET: z.string().min(1),
 });
 
+// @ts-ignore
 const parsed = envSchema.safeParse(process.env);
 
 if (!parsed.success) {

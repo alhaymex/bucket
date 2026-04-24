@@ -2,7 +2,12 @@ import type { FastifyPluginAsync } from "fastify";
 import { env } from "../env";
 import { registerExtractArticleRoute } from "./extractArticle";
 
-export const internalRoutes: FastifyPluginAsync = async (app) => {
+type InternalRoutesOptions = {
+  extractArticleHandler?: Parameters<typeof registerExtractArticleRoute>[1];
+};
+
+export const internalRoutes: FastifyPluginAsync<InternalRoutesOptions> =
+  async (app, options) => {
   app.addHook("onRequest", async (request, reply) => {
     const authorization = request.headers.authorization;
     const expected = `Bearer ${env.EXTRACTOR_SHARED_SECRET}`;
@@ -14,5 +19,5 @@ export const internalRoutes: FastifyPluginAsync = async (app) => {
     }
   });
 
-  registerExtractArticleRoute(app);
+  registerExtractArticleRoute(app, options.extractArticleHandler);
 };

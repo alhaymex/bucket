@@ -1,11 +1,15 @@
-import {
-  ExtractArticleRequestSchema,
-  ExtractArticleResponseSchema,
-} from "@bucket/common";
+import type { ExtractArticleResponse } from "@bucket/common";
+import { ExtractArticleRequestSchema, ExtractArticleResponseSchema } from "@bucket/common";
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
+import { extractArticle } from "../lib/extractArticle";
 
-export const registerExtractArticleRoute = (app: FastifyInstance) => {
+type ExtractArticleHandler = typeof extractArticle;
+
+export const registerExtractArticleRoute = (
+  app: FastifyInstance,
+  handler: ExtractArticleHandler = extractArticle,
+) => {
   app.post("/extract/article", async (request, reply) => {
     const parsed = ExtractArticleRequestSchema.safeParse(request.body);
 
@@ -16,12 +20,19 @@ export const registerExtractArticleRoute = (app: FastifyInstance) => {
       });
     }
 
-    const response = ExtractArticleResponseSchema.parse({
-      status: "error",
-      errorCode: "NOT_IMPLEMENTED",
-      errorMessage: "Extractor route not implemented yet",
-    });
+    const response = ExtractArticleResponseSchema.parse(
+      await handler(parsed.data),
+    );
 
-    return reply.code(501).send(response);
+    return reply.code(getStatusCode(response)).send(response);
   });
+};
+
+const getStatusCode = (response: ExtractArticleResponse) => {
+  if (response.status === "ok") return 200;
+  if (response.status === "blocked" || response.status === "unreadable") {
+    return 422;
+  }
+
+  return 500;
 };

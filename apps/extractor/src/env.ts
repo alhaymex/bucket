@@ -22,6 +22,7 @@ const envSchema = z.object({
     .default("development"),
   PORT: z.coerce.number().int().positive().default(3001),
   EXTRACTOR_SHARED_SECRET: z.string().min(1),
+  CHROME_PATH: z.string().min(1).optional(),
 });
 
 const parsed = envSchema.safeParse(process.env);

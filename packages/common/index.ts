@@ -19,3 +19,4 @@ export {
 } from "./schema/extractorSchema";
 
 export { isUrl, slugify, normalizeUrl } from "./utils";
+export { hasUsableArticleContent } from "./utils/article";
