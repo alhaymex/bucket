@@ -4,6 +4,7 @@ import { internalAction } from "../_generated/server";
 import * as cheerio from "cheerio";
 import { Readability } from "@mozilla/readability";
 import { DOMParser } from "linkedom";
+import { callExtractor } from "../utils/extractorClient";
 import { sanitizeArticleHtml } from "../utils/html";
 
 const toOptionalString = (value: string | null | undefined) =>
@@ -39,6 +40,38 @@ const normalizeTitle = ({
   normalizedTitle = normalizedTitle.replace(siteSuffix, "");
 
   return normalizedTitle.trim() || undefined;
+};
+
+const BLOCKED_PAGE_PATTERNS = [
+  /just a moment/i,
+  /verify you are human/i,
+  /attention required/i,
+  /cf-browser-verification/i,
+  /challenge-platform/i,
+  /cloudflare/i,
+] as const;
+
+const looksBlocked = ({
+  title,
+  html,
+}: {
+  title: string | null | undefined;
+  html: string;
+}) => {
+  const signals = `${title ?? ""}\n${html.slice(0, 4000)}`;
+
+  return BLOCKED_PAGE_PATTERNS.some((pattern) => pattern.test(signals));
+};
+
+const hasUsableArticleContent = (html: string | undefined) => {
+  if (!html) return false;
+
+  const text = html
+    .replace(/<[^>]+>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  return text.length >= 200;
 };
 
 export const getOpenGraph = internalAction({
@@ -90,6 +123,66 @@ export const getOpenGraph = internalAction({
         $('link[rel="icon"]').attr("href") ||
         new URL("/favicon.ico", link.canonicalUrl).toString();
 
+      const shouldUseExtractorFallback =
+        !res.ok ||
+        looksBlocked({
+          title: resolvedTitle,
+          html,
+        }) ||
+        !hasUsableArticleContent(sanitizedHtml);
+
+      if (shouldUseExtractorFallback) {
+        try {
+          const extractorResponse = await callExtractor({
+            url: link.canonicalUrl,
+          });
+
+          if (
+            extractorResponse.status === "ok" &&
+            extractorResponse.htmlFragment
+          ) {
+            const fallbackHtml = sanitizeArticleHtml({
+              html: extractorResponse.htmlFragment,
+              baseUrl: extractorResponse.finalUrl || link.canonicalUrl,
+            });
+            const fallbackSiteName = extractorResponse.siteName || siteName;
+            const fallbackTitle = normalizeTitle({
+              title: extractorResponse.title || resolvedTitle,
+              siteName: fallbackSiteName,
+            });
+
+            await ctx.runMutation(
+              internal.links.mutations.updateLinkOpenGraph,
+              {
+                linkId: linkId,
+                title: toOptionalString(fallbackTitle),
+                description: toOptionalString(
+                  extractorResponse.excerpt || description || article?.excerpt,
+                ),
+                thumbnailUrl: toOptionalString(image),
+                faviconUrl: favicon,
+                siteName: toOptionalString(fallbackSiteName),
+                html: toOptionalString(fallbackHtml),
+              },
+            );
+
+            console.log("[DEBUG] Extractor fallback fetched for ", {
+              linkId: linkId,
+              title: fallbackTitle,
+              status: extractorResponse.status,
+              hasReadableHtml: Boolean(fallbackHtml),
+            });
+
+            return;
+          }
+        } catch (error) {
+          console.error("[extractor-fallback] failed", {
+            error: error instanceof Error ? error.message : "unknown_error",
+            linkId,
+          });
+        }
+      }
+
       await ctx.runMutation(internal.links.mutations.updateLinkOpenGraph, {
         linkId: linkId,
         title: toOptionalString(resolvedTitle),
@@ -98,15 +191,6 @@ export const getOpenGraph = internalAction({
         faviconUrl: favicon,
         siteName: toOptionalString(siteName),
         html: toOptionalString(sanitizedHtml),
-      });
-
-      console.log("[DEBUG] OpenGraph fetched for ", {
-        linkId: linkId,
-        title: resolvedTitle,
-        description: description || article?.excerpt,
-        image,
-        favicon,
-        hasReadableHtml: Boolean(sanitizedHtml),
       });
     } catch {
       await ctx.runMutation(internal.links.mutations.markLinkOpenGraphError, {

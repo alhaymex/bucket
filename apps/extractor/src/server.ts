@@ -6,7 +6,8 @@ export const buildServer = () => {
   const app = Fastify();
 
   registerHealthRoutes(app);
-  void app.register(internalRoutes, {
+  
+  app.register(internalRoutes, {
     prefix: "/internal",
   });
 

@@ -1,4 +1,20 @@
+import { existsSync } from "node:fs";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import { z } from "zod";
+
+const currentFilePath = fileURLToPath(import.meta.url);
+const appRoot = resolve(dirname(currentFilePath), "..");
+const localEnvPath = resolve(appRoot, ".env.local");
+const envPath = resolve(appRoot, ".env");
+
+if (existsSync(envPath)) {
+  process.loadEnvFile(envPath);
+}
+
+if (existsSync(localEnvPath)) {
+  process.loadEnvFile(localEnvPath);
+}
 
 const envSchema = z.object({
   NODE_ENV: z
