@@ -8,6 +8,7 @@
     "start:android": "expo start --android",
     "start:ios": "expo start --ios",
     "lint": "expo lint",
+    "test": "node -e \"console.log('No tests defined for @bucket/mobile yet')\"",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
