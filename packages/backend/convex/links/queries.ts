@@ -1,4 +1,5 @@
-import { query } from "../_generated/server";
+import { v } from "convex/values";
+import { internalQuery, query } from "../_generated/server";
 import { getCurrentUserFromCtx } from "../auth";
 
 export const getUserRecentLinks = query({
@@ -40,5 +41,14 @@ export const getUserRecentLinks = query({
         return bTime - aTime;
       })
       .slice(0, 6);
+  },
+});
+
+export const getLinkById = internalQuery({
+  args: {
+    linkId: v.id("links"),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db.get(args.linkId);
   },
 });

@@ -104,7 +104,7 @@ export const HomeScreen = () => {
                   key={link._id}
                   title={link.title}
                   url={link.url}
-                  contentType={link.contentType}
+                  contentType={"generic"}
                   lastViewedAt={link.lastViewedAt!}
                   onPress={() => {
                     console.log(link.title);

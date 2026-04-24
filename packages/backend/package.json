@@ -12,6 +12,7 @@
     "lint": "tsc -p convex && eslint . --report-unused-disable-directives --max-warnings 0"
   },
   "dependencies": {
+    "cheerio": "^1.2.0",
     "convex": "^1.35.1",
     "svix": "^1.91.1",
     "zod": "^4.3.6"

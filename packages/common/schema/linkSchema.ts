@@ -2,15 +2,18 @@ import { z } from "zod";
 
 export const urlSchema = z
   .string()
+  .trim()
   .transform((val) => {
-    const trimmed = val.trim();
-    return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+    return /^https?:\/\//i.test(val) ? val : `https://${val}`;
   })
-  .pipe(
-    z
-      .string()
-      .regex(/^https?:\/\/([\w-]+\.)+[\w-]+(\/[\w-./?%&=]*)?$/i, "Invalid URL"),
-  );
+  .refine((val) => {
+    try {
+      const url = new URL(val);
+      return url.protocol === "http:" || url.protocol === "https:";
+    } catch {
+      return false;
+    }
+  }, "Invalid URL");
 
 export const AddLinkSchema = z.object({
   url: urlSchema,

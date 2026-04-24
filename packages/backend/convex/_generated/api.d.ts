@@ -13,10 +13,12 @@ import type * as collections_index from "../collections/index.js";
 import type * as collections_mutations from "../collections/mutations.js";
 import type * as collections_queries from "../collections/queries.js";
 import type * as http from "../http.js";
+import type * as links_actions from "../links/actions.js";
 import type * as links_mutations from "../links/mutations.js";
 import type * as links_queries from "../links/queries.js";
 import type * as users_mutations from "../users/mutations.js";
 import type * as utils_clerk from "../utils/clerk.js";
+import type * as utils_links from "../utils/links.js";
 
 import type {
   ApiFromModules,
@@ -30,10 +32,12 @@ declare const fullApi: ApiFromModules<{
   "collections/mutations": typeof collections_mutations;
   "collections/queries": typeof collections_queries;
   http: typeof http;
+  "links/actions": typeof links_actions;
   "links/mutations": typeof links_mutations;
   "links/queries": typeof links_queries;
   "users/mutations": typeof users_mutations;
   "utils/clerk": typeof utils_clerk;
+  "utils/links": typeof utils_links;
 }>;
 
 /**

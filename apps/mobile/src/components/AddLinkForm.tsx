@@ -1,4 +1,11 @@
-import { View, Text, TextInput, Pressable, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  Pressable,
+  ScrollView,
+  Alert,
+} from "react-native";
 import { Controller, useForm } from "react-hook-form";
 import type { AddLinkType } from "@bucket/common";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -52,17 +59,27 @@ export const AddLinkForm = () => {
     checkClipboard();
   }, []);
 
-  const submitForm = (form: AddLinkType) => {
-    const linkId = addLinkMutation({
-      collectionId: form.collectionId as Id<"collections">,
-      url: form.url,
-      tags: form.tags,
-      note: form.note,
-    });
+  const submitForm = async (form: AddLinkType) => {
+    const parsed = ConvexAddLinkSchema.safeParse(form);
 
-    reset();
+    if (!parsed.success) {
+      Alert.alert("Invalid URL", "Please enter a valid URL.");
+      return;
+    }
 
-    router.back();
+    try {
+      await addLinkMutation({
+        collectionId: parsed.data.collectionId as Id<"collections">,
+        url: parsed.data.url,
+        tags: parsed.data.tags,
+        note: parsed.data.note,
+      });
+
+      reset();
+      router.back();
+    } catch {
+      Alert.alert("Could not save link", "Please check the URL and try again.");
+    }
   };
 
   return (

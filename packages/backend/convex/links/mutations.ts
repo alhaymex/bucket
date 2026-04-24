@@ -1,7 +1,9 @@
 import { v } from "convex/values";
-import { mutation } from "../_generated/server";
+import { internalMutation, mutation } from "../_generated/server";
 import { getCurrentUserFromCtx } from "../auth";
 import { isUrl, normalizeUrl, urlSchema } from "@bucket/common";
+import { analyzeUrl } from "../utils/links";
+import { internal } from "../_generated/api";
 
 export const saveLink = mutation({
   args: {
@@ -23,6 +25,8 @@ export const saveLink = mutation({
 
     const normalizedUrl = normalizeUrl(parsedUrl.data);
 
+    const analyzed = analyzeUrl(parsedUrl.data);
+
     const collection = await ctx.db.get(args.collectionId);
 
     if (!collection || collection.userId !== user._id)
@@ -31,7 +35,7 @@ export const saveLink = mutation({
     const existingLink = await ctx.db
       .query("links")
       .withIndex("by_user_url", (q) =>
-        q.eq("userId", user._id).eq("url", normalizedUrl),
+        q.eq("userId", user._id).eq("canonicalUrl", analyzed.canonicalUrl),
       )
       .unique();
 
@@ -45,18 +49,78 @@ export const saveLink = mutation({
 
     const linkId = await ctx.db.insert("links", {
       userId: user._id,
-      url: args.url,
-      contentType: "article",
+      url: parsedUrl.data,
+      canonicalUrl: analyzed.canonicalUrl,
+      sourceHost: analyzed.sourceHost,
+      platform: analyzed.platform,
+      externalId: analyzed.externalId,
+      embedUrl: analyzed.embedUrl,
+      contentType: analyzed.contentType,
+      renderType: analyzed.renderType,
       status: "pending",
       tags: args.tags,
+      note: args.note,
       collectionId: args.collectionId,
       isPinned: false,
       isArchived: false,
       lastViewedAt: Date.now(),
     });
 
-    // TODO: start a background job to get the url metadata
+    await ctx.scheduler.runAfter(0, internal.links.actions.getOpenGraph, {
+      linkId,
+    });
 
     return linkId;
+  },
+});
+
+export const updateLinkOpenGraph = internalMutation({
+  args: {
+    linkId: v.id("links"),
+    title: v.optional(v.string()),
+    description: v.optional(v.string()),
+    faviconUrl: v.optional(v.string()),
+    thumbnailUrl: v.optional(v.string()),
+    siteName: v.optional(v.string()),
+    html: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.linkId, {
+      title: args.title,
+      description: args.description,
+      faviconUrl: args.faviconUrl,
+      thumbnailUrl: args.thumbnailUrl,
+      status: "ready",
+    });
+
+    const existingMetadata = await ctx.db
+      .query("link_metadata")
+      .withIndex("by_link", (q) => q.eq("linkId", args.linkId))
+      .unique();
+
+    const metadata = {
+      linkId: args.linkId,
+      siteName: args.siteName,
+      html: args.html,
+      images: args.thumbnailUrl ? [args.thumbnailUrl] : [],
+      fetchedAt: Date.now(),
+    };
+
+    if (existingMetadata) {
+      await ctx.db.patch(existingMetadata._id, metadata);
+    } else {
+      await ctx.db.insert("link_metadata", metadata);
+    }
+  },
+});
+
+export const markLinkOpenGraphError = internalMutation({
+  args: {
+    linkId: v.id("links"),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.linkId, {
+      status: "error",
+    });
   },
 });

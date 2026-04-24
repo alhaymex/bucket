@@ -24,18 +24,27 @@ export default defineSchema({
   links: defineTable({
     userId: v.id("users"),
     collectionId: v.optional(v.id("collections")),
+
     url: v.string(),
+    canonicalUrl: v.string(),
+    sourceHost: v.string(),
+
+    platform: v.string(),
+
+    externalId: v.optional(v.string()),
+    embedUrl: v.optional(v.string()),
 
     note: v.optional(v.string()),
 
     contentType: v.union(
-      v.literal("youtube"),
+      v.literal("video"),
+      v.literal("social"),
       v.literal("article"),
       v.literal("product"),
-      v.literal("tweet"),
-      v.literal("github"),
       v.literal("generic"),
     ),
+
+    renderType: v.union(v.literal("embed"), v.literal("reader")),
 
     // Open Graph
     title: v.optional(v.string()),
@@ -56,87 +65,45 @@ export default defineSchema({
     lastViewedAt: v.optional(v.number()),
   })
     .index("by_user", ["userId"])
-    .index("by_collection", ["collectionId"])
+    .index("by_user_collection", ["userId", "collectionId"])
     .index("by_user_type", ["userId", "contentType"])
     .index("by_user_last_viewed", ["userId", "lastViewedAt"])
-    .index("by_user_url", ["userId", "url"])
+    .index("by_user_url", ["userId", "canonicalUrl"])
     .searchIndex("search_links", {
       searchField: "title",
       filterFields: ["userId", "contentType", "tags"],
     }),
 
   // Links Previews
-  youtube_previews: defineTable({
+  link_metadata: defineTable({
     linkId: v.id("links"),
-    videoId: v.string(),
-    channelId: v.string(),
-    channelName: v.string(),
-    channelAvatarUrl: v.optional(v.string()),
-    duration: v.number(), // in seconds
-    description: v.optional(v.string()),
-    viewCount: v.optional(v.number()),
-    likeCount: v.optional(v.number()),
-    publishedAt: v.optional(v.number()),
-  }).index("by_link", ["linkId"]),
 
-  article_previews: defineTable({
-    linkId: v.id("links"),
     author: v.optional(v.string()),
     siteName: v.optional(v.string()),
     publisherLogoUrl: v.optional(v.string()),
-    readingTime: v.optional(v.number()), // in minutes
-    shortDescription: v.optional(v.string()),
-    fullText: v.optional(v.string()),
-    articlePublishedAt: v.optional(v.number()),
+
+    html: v.optional(v.string()),
+    markdown: v.optional(v.string()),
+    text: v.optional(v.string()),
+
+    readingTime: v.optional(v.number()),
     language: v.optional(v.string()),
-    images: v.array(v.string()),
-  }).index("by_link", ["linkId"]),
+    publishedAt: v.optional(v.number()),
 
-  // Products from platforms like Amazon, Etsy, etc.
-  product_previews: defineTable({
-    linkId: v.id("links"),
-    storeName: v.string(),
-    storeLogoUrl: v.optional(v.string()),
-    productId: v.string(),
-    price: v.optional(v.number()),
-    currency: v.optional(v.string()),
-    availability: v.optional(
-      v.union(
-        v.literal("in_stock"),
-        v.literal("out_of_stock"),
-        v.literal("preorder"),
-      ),
-    ),
-    rating: v.optional(v.number()),
-    ratingCount: v.optional(v.number()),
-    brand: v.optional(v.string()),
-    images: v.array(v.string()),
-  }).index("by_link", ["linkId"]),
-
-  // X is a wierd variable name
-  tweet_previews: defineTable({
-    linkId: v.id("links"),
-    tweetId: v.string(),
-    tweetText: v.string(),
     embedHtml: v.optional(v.string()),
-    authorName: v.string(),
-    authorUsername: v.string(),
-    tweetedAt: v.number(),
-  }).index("by_link", ["linkId"]),
 
-  github_previews: defineTable({
-    linkId: v.id("links"),
-    repoOwner: v.string(),
-    repoName: v.string(),
-    description: v.optional(v.string()),
-    language: v.optional(v.string()),
-    stars: v.number(),
-    forks: v.number(),
-    openIssues: v.number(),
-    isArchived: v.boolean(),
-    license: v.optional(v.string()),
-    topics: v.array(v.string()),
-    lastCommitAt: v.optional(v.number()),
+    images: v.array(v.string()),
+
+    stats: v.optional(
+      v.object({
+        viewCount: v.optional(v.number()),
+        likeCount: v.optional(v.number()),
+        commentCount: v.optional(v.number()),
+        shareCount: v.optional(v.number()),
+      }),
+    ),
+
+    fetchedAt: v.optional(v.number()),
   }).index("by_link", ["linkId"]),
 
   link_check_jobs: defineTable({

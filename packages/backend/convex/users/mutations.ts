@@ -124,26 +124,10 @@ async function reassignUserReferences(
 
 async function deleteLinkDependents(ctx: MutationCtx, linkId: Id<"links">) {
   const articlePreviews = await ctx.db
-    .query("article_previews")
+    .query("link_metadata")
     .withIndex("by_link", (q) => q.eq("linkId", linkId))
     .collect();
   for (const preview of articlePreviews) {
-    await ctx.db.delete("article_previews", preview._id);
-  }
-
-  const productPreviews = await ctx.db
-    .query("product_previews")
-    .withIndex("by_link", (q) => q.eq("linkId", linkId))
-    .collect();
-  for (const preview of productPreviews) {
-    await ctx.db.delete("product_previews", preview._id);
-  }
-
-  const youtubePreviews = await ctx.db
-    .query("youtube_previews")
-    .withIndex("by_link", (q) => q.eq("linkId", linkId))
-    .collect();
-  for (const preview of youtubePreviews) {
-    await ctx.db.delete("youtube_previews", preview._id);
+    await ctx.db.delete("link_metadata", preview._id);
   }
 }
