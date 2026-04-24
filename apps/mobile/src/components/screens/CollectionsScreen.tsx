@@ -7,6 +7,7 @@ import React from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { collectionIconMap, CollectionIconName } from "../IconSelector";
+import { Skeleton } from "../ui/Skeleton";
 
 // TODO: use flatlist
 // Add dragging
@@ -16,10 +17,11 @@ const CollectionSkeleton = ({ count = 3 }: { count?: number }) => (
     {Array.from({ length: count }).map((_, i) => (
       <View key={i}>
         <View className="flex-row items-center gap-3 px-4 py-3.5">
-          <View className="h-9 w-9 rounded-md bg-bucket-border animate-pulse" />
-          <View className="h-4 flex-1 rounded bg-bucket-border animate-pulse" />
-          <View className="h-4 w-4 rounded bg-bucket-border animate-pulse" />
+          <Skeleton className="h-9 w-9 rounded-md" />
+          <Skeleton className="h-4 flex-1" />
+          <Skeleton className="h-4 w-4" />
         </View>
+
         {i < count - 1 && <View className="ml-16 h-px bg-bucket-border" />}
       </View>
     ))}
@@ -50,7 +52,7 @@ export const CollectionsScreen = () => {
 
           <View className="rounded-2xl border border-bucket-border bg-bucket-muted overflow-hidden">
             {isLoading ? (
-              <CollectionSkeleton count={3} />
+              <CollectionSkeleton count={4} />
             ) : (
               systemCollections?.map((item, i) => {
                 const Icon = item.icon
@@ -97,7 +99,7 @@ export const CollectionsScreen = () => {
 
           <View className="rounded-2xl border border-bucket-border bg-bucket-muted overflow-hidden">
             {isLoading ? (
-              <CollectionSkeleton count={4} />
+              <CollectionSkeleton count={3} />
             ) : userCollections?.length === 0 ? (
               <Text className="px-4 py-3.5 text-sm text-center text-bucket-muted-foreground">
                 No collections yet
