@@ -5,6 +5,10 @@ import * as cheerio from "cheerio";
 import { Readability } from "@mozilla/readability";
 import { DOMParser } from "linkedom";
 import { callExtractor } from "../utils/extractorClient";
+import {
+  calculateReadingTimeMinutes,
+  normalizeArticleText,
+} from "../utils/article";
 import { sanitizeArticleHtml } from "../utils/html";
 
 const toOptionalString = (value: string | null | undefined) =>
@@ -83,6 +87,13 @@ export const getOpenGraph = internalAction({
 
     if (!link) return;
 
+    if (link.renderType === "embed") {
+      await ctx.runMutation(internal.links.mutations.updateLinkOpenGraph, {
+        linkId,
+      });
+      return;
+    }
+
     try {
       const res = await fetch(link.canonicalUrl, {
         headers: {
@@ -103,12 +114,11 @@ export const getOpenGraph = internalAction({
             baseUrl: link.canonicalUrl,
           })
         : undefined;
+      const articleText = normalizeArticleText(article?.textContent);
 
       const getMeta = (name: string) =>
         $(`meta[property="${name}"]`).attr("content") ||
         $(`meta[name="${name}"]`).attr("content");
-
-      const title = getMeta("og:title") || $("title").text() || undefined;
 
       const description = getMeta("og:description") || getMeta("description");
 
@@ -150,6 +160,9 @@ export const getOpenGraph = internalAction({
               title: extractorResponse.title || resolvedTitle,
               siteName: fallbackSiteName,
             });
+            const fallbackText = normalizeArticleText(
+              extractorResponse.textContent,
+            );
 
             await ctx.runMutation(
               internal.links.mutations.updateLinkOpenGraph,
@@ -163,6 +176,8 @@ export const getOpenGraph = internalAction({
                 faviconUrl: favicon,
                 siteName: toOptionalString(fallbackSiteName),
                 html: toOptionalString(fallbackHtml),
+                text: toOptionalString(fallbackText),
+                readingTime: calculateReadingTimeMinutes(fallbackText),
               },
             );
 
@@ -191,6 +206,8 @@ export const getOpenGraph = internalAction({
         faviconUrl: favicon,
         siteName: toOptionalString(siteName),
         html: toOptionalString(sanitizedHtml),
+        text: toOptionalString(articleText),
+        readingTime: calculateReadingTimeMinutes(articleText),
       });
     } catch {
       await ctx.runMutation(internal.links.mutations.markLinkOpenGraphError, {
