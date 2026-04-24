@@ -1,5 +1,7 @@
 import { v } from "convex/values";
 import { internal } from "../_generated/api";
+import type { Id } from "../_generated/dataModel";
+import type { ActionCtx } from "../_generated/server";
 import { internalAction } from "../_generated/server";
 import * as cheerio from "cheerio";
 import { Readability } from "@mozilla/readability";
@@ -78,141 +80,148 @@ const hasUsableArticleContent = (html: string | undefined) => {
   return text.length >= 200;
 };
 
-export const getOpenGraph = internalAction({
-  args: { linkId: v.id("links") },
-  handler: async (ctx, { linkId }) => {
-    const link = await ctx.runQuery(internal.links.queries.getLinkById, {
-      linkId: linkId,
+type OpenGraphActionCtx = Pick<ActionCtx, "runQuery" | "runMutation">;
+
+export const handleOpenGraph = async (
+  ctx: OpenGraphActionCtx,
+  { linkId }: { linkId: Id<"links"> },
+) => {
+  const link = await ctx.runQuery(internal.links.queries.getLinkById, {
+    linkId: linkId,
+  });
+
+  if (!link) return;
+
+  if (link.renderType === "embed") {
+    await ctx.runMutation(internal.links.mutations.updateLinkOpenGraph, {
+      linkId,
+    });
+    return;
+  }
+
+  try {
+    const res = await fetch(link.canonicalUrl, {
+      headers: {
+        "User-Agent": "Mozilla/5.0",
+      },
     });
 
-    if (!link) return;
+    const html = await res.text();
+    const $ = cheerio.load(html);
+    const document = new DOMParser().parseFromString(
+      html,
+      "text/html",
+    ) as unknown as Document;
+    const article = new Readability(document).parse();
+    const sanitizedHtml = article?.content
+      ? sanitizeArticleHtml({
+          html: article.content,
+          baseUrl: link.canonicalUrl,
+        })
+      : undefined;
+    const articleText = normalizeArticleText(article?.textContent);
 
-    if (link.renderType === "embed") {
-      await ctx.runMutation(internal.links.mutations.updateLinkOpenGraph, {
-        linkId,
-      });
-      return;
-    }
+    const getMeta = (name: string) =>
+      $(`meta[property="${name}"]`).attr("content") ||
+      $(`meta[name="${name}"]`).attr("content");
 
-    try {
-      const res = await fetch(link.canonicalUrl, {
-        headers: {
-          "User-Agent": "Mozilla/5.0",
-        },
-      });
+    const description = getMeta("og:description") || getMeta("description");
 
-      const html = await res.text();
-      const $ = cheerio.load(html);
-      const document = new DOMParser().parseFromString(
+    const image = getMeta("og:image");
+    const siteName = getMeta("og:site_name") || article?.siteName;
+    const resolvedTitle = normalizeTitle({
+      title: article?.title || getMeta("og:title") || $("title").text(),
+      siteName,
+    });
+
+    const favicon =
+      $('link[rel="icon"]').attr("href") ||
+      new URL("/favicon.ico", link.canonicalUrl).toString();
+
+    const shouldUseExtractorFallback =
+      !res.ok ||
+      looksBlocked({
+        title: resolvedTitle,
         html,
-        "text/html",
-      ) as unknown as Document;
-      const article = new Readability(document).parse();
-      const sanitizedHtml = article?.content
-        ? sanitizeArticleHtml({
-            html: article.content,
-            baseUrl: link.canonicalUrl,
-          })
-        : undefined;
-      const articleText = normalizeArticleText(article?.textContent);
+      }) ||
+      !hasUsableArticleContent(sanitizedHtml);
 
-      const getMeta = (name: string) =>
-        $(`meta[property="${name}"]`).attr("content") ||
-        $(`meta[name="${name}"]`).attr("content");
+    if (shouldUseExtractorFallback) {
+      try {
+        const extractorResponse = await callExtractor({
+          url: link.canonicalUrl,
+        });
 
-      const description = getMeta("og:description") || getMeta("description");
-
-      const image = getMeta("og:image");
-      const siteName = getMeta("og:site_name") || article?.siteName;
-      const resolvedTitle = normalizeTitle({
-        title: article?.title || getMeta("og:title") || $("title").text(),
-        siteName,
-      });
-
-      const favicon =
-        $('link[rel="icon"]').attr("href") ||
-        new URL("/favicon.ico", link.canonicalUrl).toString();
-
-      const shouldUseExtractorFallback =
-        !res.ok ||
-        looksBlocked({
-          title: resolvedTitle,
-          html,
-        }) ||
-        !hasUsableArticleContent(sanitizedHtml);
-
-      if (shouldUseExtractorFallback) {
-        try {
-          const extractorResponse = await callExtractor({
-            url: link.canonicalUrl,
+        if (
+          extractorResponse.status === "ok" &&
+          extractorResponse.htmlFragment
+        ) {
+          const fallbackHtml = sanitizeArticleHtml({
+            html: extractorResponse.htmlFragment,
+            baseUrl: extractorResponse.finalUrl || link.canonicalUrl,
           });
+          const fallbackSiteName = extractorResponse.siteName || siteName;
+          const fallbackTitle = normalizeTitle({
+            title: extractorResponse.title || resolvedTitle,
+            siteName: fallbackSiteName,
+          });
+          const fallbackText = normalizeArticleText(
+            extractorResponse.textContent,
+          );
 
-          if (
-            extractorResponse.status === "ok" &&
-            extractorResponse.htmlFragment
-          ) {
-            const fallbackHtml = sanitizeArticleHtml({
-              html: extractorResponse.htmlFragment,
-              baseUrl: extractorResponse.finalUrl || link.canonicalUrl,
-            });
-            const fallbackSiteName = extractorResponse.siteName || siteName;
-            const fallbackTitle = normalizeTitle({
-              title: extractorResponse.title || resolvedTitle,
-              siteName: fallbackSiteName,
-            });
-            const fallbackText = normalizeArticleText(
-              extractorResponse.textContent,
-            );
-
-            await ctx.runMutation(
-              internal.links.mutations.updateLinkOpenGraph,
-              {
-                linkId: linkId,
-                title: toOptionalString(fallbackTitle),
-                description: toOptionalString(
-                  extractorResponse.excerpt || description || article?.excerpt,
-                ),
-                thumbnailUrl: toOptionalString(image),
-                faviconUrl: favicon,
-                siteName: toOptionalString(fallbackSiteName),
-                html: toOptionalString(fallbackHtml),
-                text: toOptionalString(fallbackText),
-                readingTime: calculateReadingTimeMinutes(fallbackText),
-              },
-            );
-
-            console.log("[DEBUG] Extractor fallback fetched for ", {
+          await ctx.runMutation(
+            internal.links.mutations.updateLinkOpenGraph,
+            {
               linkId: linkId,
-              title: fallbackTitle,
-              status: extractorResponse.status,
-              hasReadableHtml: Boolean(fallbackHtml),
-            });
+              title: toOptionalString(fallbackTitle),
+              description: toOptionalString(
+                extractorResponse.excerpt || description || article?.excerpt,
+              ),
+              thumbnailUrl: toOptionalString(image),
+              faviconUrl: favicon,
+              siteName: toOptionalString(fallbackSiteName),
+              html: toOptionalString(fallbackHtml),
+              text: toOptionalString(fallbackText),
+              readingTime: calculateReadingTimeMinutes(fallbackText),
+            },
+          );
 
-            return;
-          }
-        } catch (error) {
-          console.error("[extractor-fallback] failed", {
-            error: error instanceof Error ? error.message : "unknown_error",
-            linkId,
+          console.log("[DEBUG] Extractor fallback fetched for ", {
+            linkId: linkId,
+            title: fallbackTitle,
+            status: extractorResponse.status,
+            hasReadableHtml: Boolean(fallbackHtml),
           });
-        }
-      }
 
-      await ctx.runMutation(internal.links.mutations.updateLinkOpenGraph, {
-        linkId: linkId,
-        title: toOptionalString(resolvedTitle),
-        description: toOptionalString(description || article?.excerpt),
-        thumbnailUrl: toOptionalString(image),
-        faviconUrl: favicon,
-        siteName: toOptionalString(siteName),
-        html: toOptionalString(sanitizedHtml),
-        text: toOptionalString(articleText),
-        readingTime: calculateReadingTimeMinutes(articleText),
-      });
-    } catch {
-      await ctx.runMutation(internal.links.mutations.markLinkOpenGraphError, {
-        linkId: linkId,
-      });
+          return;
+        }
+      } catch (error) {
+        console.error("[extractor-fallback] failed", {
+          error: error instanceof Error ? error.message : "unknown_error",
+          linkId,
+        });
+      }
     }
-  },
+
+    await ctx.runMutation(internal.links.mutations.updateLinkOpenGraph, {
+      linkId: linkId,
+      title: toOptionalString(resolvedTitle),
+      description: toOptionalString(description || article?.excerpt),
+      thumbnailUrl: toOptionalString(image),
+      faviconUrl: favicon,
+      siteName: toOptionalString(siteName),
+      html: toOptionalString(sanitizedHtml),
+      text: toOptionalString(articleText),
+      readingTime: calculateReadingTimeMinutes(articleText),
+    });
+  } catch {
+    await ctx.runMutation(internal.links.mutations.markLinkOpenGraphError, {
+      linkId: linkId,
+    });
+  }
+};
+
+export const getOpenGraph = internalAction({
+  args: { linkId: v.id("links") },
+  handler: handleOpenGraph,
 });

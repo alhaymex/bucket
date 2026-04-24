@@ -9,6 +9,8 @@
     "dev": "convex dev",
     "predev": "convex dev --until-success && convex dashboard",
     "logs": "convex logs",
+    "test": "vitest run",
+    "typecheck": "tsc -p convex",
     "lint": "tsc -p convex && eslint . --report-unused-disable-directives --max-warnings 0"
   },
   "dependencies": {
@@ -31,7 +33,8 @@
     "@typescript-eslint/parser": "^8.58.1",
     "eslint": "^9.39.4",
     "globals": "^17.4.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.5"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
