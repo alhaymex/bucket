@@ -2,58 +2,16 @@ import { LinkListItem } from "@/components/LinkListItem";
 import { useColors } from "@/hooks/useColors";
 import { api } from "@bucket/backend";
 import { useQuery } from "convex/react";
+import { useRouter } from "expo-router";
 import { ArrowUpRight, Inbox, Sparkles } from "lucide-react-native";
 import React from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-const CONTINUE_LINKS: {
-  title: string;
-  type: "article" | "youtube-video" | "github-repo" | "product";
-  source: string;
-  timestamp: number;
-}[] = [
-  {
-    title: "Why products need sharper onboarding loops",
-    source: "Linear Blog",
-    type: "article",
-    timestamp: 1776889980049,
-  },
-  {
-    title: "Reanimated 3 — gesture & layout examples",
-    source: "youtube.com",
-    timestamp: 1776889927213,
-    type: "youtube-video",
-  },
-  {
-    title: "software-mansion/react-native-screens",
-    source: "github.com",
-    type: "github-repo",
-    timestamp: 1776889960621,
-  },
-  {
-    title: "The fastest way to build a useful reading queue",
-    source: "Personal blog",
-    type: "article",
-    timestamp: 1776889971931,
-  },
-  {
-    title: "Notion just shipped a native mobile editor",
-    source: "notion",
-    timestamp: 1776889913317,
-    type: "article",
-  },
-  {
-    title: "Kindle Scribe — 2nd Gen",
-    source: "amazon.com",
-    timestamp: 1776889905578,
-    type: "product",
-  },
-];
-
 export const HomeScreen = () => {
   const token = useColors();
   const data = useQuery(api.links.queries.getUserRecentLinks);
+  const router = useRouter();
 
   return (
     <SafeAreaView className="flex-1 bg-bucket-background" edges={["bottom"]}>
@@ -107,7 +65,10 @@ export const HomeScreen = () => {
                   contentType={"generic"}
                   lastViewedAt={link.lastViewedAt!}
                   onPress={() => {
-                    console.log(link.title);
+                    router.push({
+                      pathname: "/view/[linkId]",
+                      params: { linkId: link._id },
+                    });
                   }}
                 />
               ))}

@@ -18,6 +18,7 @@ import type * as links_mutations from "../links/mutations.js";
 import type * as links_queries from "../links/queries.js";
 import type * as users_mutations from "../users/mutations.js";
 import type * as utils_clerk from "../utils/clerk.js";
+import type * as utils_html from "../utils/html.js";
 import type * as utils_links from "../utils/links.js";
 
 import type {
@@ -37,6 +38,7 @@ declare const fullApi: ApiFromModules<{
   "links/queries": typeof links_queries;
   "users/mutations": typeof users_mutations;
   "utils/clerk": typeof utils_clerk;
+  "utils/html": typeof utils_html;
   "utils/links": typeof utils_links;
 }>;
 

@@ -5,11 +5,15 @@ import { useAuth } from "@clerk/expo";
 import { Stack } from "expo-router";
 
 const Routes = () => {
-  const { isSignedIn } = useAuth();
+  const { isSignedIn, isLoaded } = useAuth();
+
+  if (!isLoaded) {
+    return null;
+  }
 
   return (
     <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Protected guard={!!isSignedIn}>
+      <Stack.Protected guard={isSignedIn === true}>
         <Stack.Screen name="(app)" />
         <Stack.Screen
           name="add"
@@ -20,6 +24,10 @@ const Routes = () => {
           options={{ presentation: "modal", headerShown: false }}
         />
         <Stack.Screen
+          name="view/[linkId]"
+          options={{ presentation: "modal", headerShown: false }}
+        />
+        <Stack.Screen
           name="profile"
           options={{
             presentation: "modal",
@@ -27,7 +35,7 @@ const Routes = () => {
           }}
         />
       </Stack.Protected>
-      <Stack.Protected guard={!isSignedIn}>
+      <Stack.Protected guard={isSignedIn === false}>
         <Stack.Screen name="(auth)" />
       </Stack.Protected>
     </Stack>

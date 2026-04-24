@@ -44,11 +44,38 @@ export const getUserRecentLinks = query({
   },
 });
 
+export const getUserLinkById = query({
+  args: {
+    linkId: v.id("links"),
+  },
+  handler: async (ctx, args) => {
+    const user = await getCurrentUserFromCtx(ctx);
+
+    if (!user) throw new Error("Unauthorized!");
+
+    const link = await ctx.db.get("links", args.linkId);
+
+    if (!link || link.userId !== user._id) {
+      throw new Error("Link not found!");
+    }
+
+    const metadata = await ctx.db
+      .query("link_metadata")
+      .withIndex("by_link", (q) => q.eq("linkId", args.linkId))
+      .unique();
+
+    return {
+      link,
+      metadata,
+    };
+  },
+});
+
 export const getLinkById = internalQuery({
   args: {
     linkId: v.id("links"),
   },
   handler: async (ctx, args) => {
-    return await ctx.db.get(args.linkId);
+    return await ctx.db.get("links", args.linkId);
   },
 });

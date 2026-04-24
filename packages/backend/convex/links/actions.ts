@@ -4,8 +4,10 @@ import { internalAction } from "../_generated/server";
 import * as cheerio from "cheerio";
 import { Readability } from "@mozilla/readability";
 import { DOMParser } from "linkedom";
+import { sanitizeArticleHtml } from "../utils/html";
 
-const toOptionalString = (value: string | null | undefined) => value ?? undefined;
+const toOptionalString = (value: string | null | undefined) =>
+  value ?? undefined;
 
 export const getOpenGraph = internalAction({
   args: { linkId: v.id("links") },
@@ -30,6 +32,12 @@ export const getOpenGraph = internalAction({
         "text/html",
       ) as unknown as Document;
       const article = new Readability(document).parse();
+      const sanitizedHtml = article?.content
+        ? sanitizeArticleHtml({
+            html: article.content,
+            baseUrl: link.canonicalUrl,
+          })
+        : undefined;
 
       const getMeta = (name: string) =>
         $(`meta[property="${name}"]`).attr("content") ||
@@ -51,8 +59,10 @@ export const getOpenGraph = internalAction({
         description: toOptionalString(description || article?.excerpt),
         thumbnailUrl: toOptionalString(image),
         faviconUrl: favicon,
-        siteName: toOptionalString(getMeta("og:site_name") || article?.siteName),
-        html: toOptionalString(article?.content),
+        siteName: toOptionalString(
+          getMeta("og:site_name") || article?.siteName,
+        ),
+        html: toOptionalString(sanitizedHtml),
       });
 
       console.log("[DEBUG] OpenGraph fetched for ", {
@@ -61,7 +71,7 @@ export const getOpenGraph = internalAction({
         description: description || article?.excerpt,
         image,
         favicon,
-        hasReadableHtml: Boolean(article?.content),
+        hasReadableHtml: Boolean(sanitizedHtml),
       });
     } catch {
       await ctx.runMutation(internal.links.mutations.markLinkOpenGraphError, {
