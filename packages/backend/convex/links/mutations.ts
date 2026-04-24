@@ -25,7 +25,7 @@ export const saveLink = mutation({
 
     const analyzed = analyzeUrl(parsedUrl.data);
 
-    const collection = await ctx.db.get(args.collectionId);
+    const collection = await ctx.db.get("collections", args.collectionId);
 
     if (!collection || collection.userId !== user._id)
       throw new Error("No collection found!");
@@ -85,7 +85,7 @@ export const updateLinkOpenGraph = internalMutation({
     readingTime: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    await ctx.db.patch(args.linkId, {
+    await ctx.db.patch("links", args.linkId, {
       title: args.title,
       description: args.description,
       faviconUrl: args.faviconUrl,
@@ -109,7 +109,7 @@ export const updateLinkOpenGraph = internalMutation({
     };
 
     if (existingMetadata) {
-      await ctx.db.patch(existingMetadata._id, metadata);
+      await ctx.db.patch("link_metadata", existingMetadata._id, metadata);
     } else {
       await ctx.db.insert("link_metadata", metadata);
     }
@@ -121,7 +121,7 @@ export const markLinkOpenGraphError = internalMutation({
     linkId: v.id("links"),
   },
   handler: async (ctx, args) => {
-    await ctx.db.patch(args.linkId, {
+    await ctx.db.patch("links", args.linkId, {
       status: "error",
     });
   },

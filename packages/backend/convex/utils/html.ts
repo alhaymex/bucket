@@ -1,5 +1,5 @@
 import * as cheerio from "cheerio";
-import sanitizeHtml, { type IOptions } from "sanitize-html";
+import sanitizeHtml from "sanitize-html";
 
 type TransformTagName = string;
 type TransformTagAttributes = Record<string, string>;
@@ -137,7 +137,9 @@ const sanitizeBaseArticleHtml = ({
         };
       },
       img: (tagName: TransformTagName, attribs: TransformTagAttributes) => {
-        const src = attribs.src ? absolutizeUrl(attribs.src, baseUrl) : undefined;
+        const src = attribs.src
+          ? absolutizeUrl(attribs.src, baseUrl)
+          : undefined;
         const srcset = attribs.srcset
           ? sanitizeSrcSet(attribs.srcset, baseUrl)
           : undefined;

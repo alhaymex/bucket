@@ -4,7 +4,9 @@ import { registerHealthRoutes } from "./routes/health";
 import { internalRoutes as internalRoutesPlugin } from "./routes/internal";
 
 type BuildServerOptions = {
-  extractArticleHandler?: Parameters<typeof internalRoutes>[1]["extractArticleHandler"];
+  extractArticleHandler?: Parameters<
+    typeof internalRoutes
+  >[1]["extractArticleHandler"];
 };
 
 export const buildServer = (options: BuildServerOptions = {}) => {

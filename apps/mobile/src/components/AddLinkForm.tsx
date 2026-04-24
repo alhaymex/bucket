@@ -9,7 +9,7 @@ import {
 import { Controller, useForm } from "react-hook-form";
 import type { AddLinkType } from "@bucket/common";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { AlignLeft, Clipboard, Link, X } from "lucide-react-native";
+import { AlignLeft, Clipboard, Link } from "lucide-react-native";
 import { useColors } from "@/hooks/useColors";
 import { useEffect, useState } from "react";
 import * as ExpoClipboard from "expo-clipboard";
@@ -51,7 +51,7 @@ export const AddLinkForm = () => {
         const text = await ExpoClipboard.getStringAsync();
         const trimmed = text.trim();
         setClipboardUrl(isUrl(trimmed) ? trimmed : null);
-      } catch (error) {
+      } catch {
         setClipboardUrl(null);
       }
     };

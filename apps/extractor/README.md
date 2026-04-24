@@ -9,6 +9,7 @@ pnpm --filter @bucket/extractor dev
 ```
 
 Environment:
+
 - `NODE_ENV` (`development` by default)
 - `PORT` (default: `3001`)
 - `EXTRACTOR_SHARED_SECRET` (required)

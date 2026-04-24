@@ -1,6 +1,4 @@
 import {
-  View,
-  Text,
   KeyboardAvoidingView,
   Platform,
   TouchableWithoutFeedback,

@@ -1,5 +1,8 @@
 import type { ExtractArticleResponse } from "@bucket/common";
-import { ExtractArticleRequestSchema, ExtractArticleResponseSchema } from "@bucket/common";
+import {
+  ExtractArticleRequestSchema,
+  ExtractArticleResponseSchema,
+} from "@bucket/common";
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { extractArticle } from "../lib/extractArticle";

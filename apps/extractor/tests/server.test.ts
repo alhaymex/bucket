@@ -3,9 +3,7 @@ import { afterEach, describe, expect, it } from "vitest";
 
 process.env.EXTRACTOR_SHARED_SECRET = "test-secret";
 
-let buildServerPromise: Promise<
-  typeof import("../src/server")
-> | null = null;
+let buildServerPromise: Promise<typeof import("../src/server")> | null = null;
 
 const appsUnderTest = new Set<Awaited<ReturnType<typeof createTestServer>>>();
 
@@ -17,9 +15,7 @@ const getBuildServer = async () => {
   return buildServer;
 };
 
-const createTestServer = async (
-  responseOverride?: ExtractArticleResponse,
-) => {
+const createTestServer = async (responseOverride?: ExtractArticleResponse) => {
   const buildServer = await getBuildServer();
   const app = buildServer({
     extractArticleHandler: async () =>

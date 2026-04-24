@@ -55,11 +55,13 @@ const looksBlocked = ({
   return signalCount >= 2;
 };
 
-const enableLightweightPageMode = async (page: Awaited<ReturnType<typeof launchBrowser>> extends {
-  newPage: () => Promise<infer T>;
-}
-  ? T
-  : never) => {
+const enableLightweightPageMode = async (
+  page: Awaited<ReturnType<typeof launchBrowser>> extends {
+    newPage: () => Promise<infer T>;
+  }
+    ? T
+    : never,
+) => {
   await page.setRequestInterception(true);
   page.on("request", (request) => {
     const action = BLOCKED_RESOURCE_TYPES.has(request.resourceType())

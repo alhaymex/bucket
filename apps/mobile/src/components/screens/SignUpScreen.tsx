@@ -22,7 +22,6 @@ import AppleLogoWhite from "@/assets/images/logos/apple-white.svg";
 import GoogleLogo from "@/assets/images/logos/google.svg";
 import { useSignUp, useSSO } from "@clerk/expo";
 import { useState } from "react";
-import { email } from "zod";
 
 type AuthAction = "oauth_google" | "oauth_apple" | "email" | null;
 

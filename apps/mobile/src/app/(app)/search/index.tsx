@@ -1,5 +1,5 @@
-import { Stack, useIsFocused } from "expo-router";
-import { ActivityIndicator, ScrollView, View } from "react-native";
+import { Stack } from "expo-router";
+import { ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Search() {

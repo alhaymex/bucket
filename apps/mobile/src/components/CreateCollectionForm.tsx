@@ -5,15 +5,10 @@ import { FormHeader } from "./FormHeader";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CreateCollectionSchema, CreateCollectionType } from "@bucket/common";
-import { AlignLeft, Link, Pen, Pencil } from "lucide-react-native";
+import { AlignLeft, Pencil } from "lucide-react-native";
 import { useMutation } from "convex/react";
 import { api } from "@bucket/backend";
-import {
-  collectionIconMap,
-  CollectionIconName,
-  IconSelector,
-} from "./IconSelector";
-import z from "zod";
+import { CollectionIconName, IconSelector } from "./IconSelector";
 
 export const CreateCollectionForm = () => {
   const token = useColors();
