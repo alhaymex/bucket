@@ -1,13 +1,8 @@
 import * as cheerio from "cheerio";
 import sanitizeHtml, { type IOptions } from "sanitize-html";
 
-type TransformTagName = Parameters<
-  NonNullable<IOptions["transformTags"]>[string]
->[0];
-
-type TransformTagAttributes = Parameters<
-  NonNullable<IOptions["transformTags"]>[string]
->[1];
+type TransformTagName = string;
+type TransformTagAttributes = Record<string, string>;
 
 const READING_TIME_PATTERN =
   /^\s*(?:\d+|[a-z]+)\s*(?:-|to\s+)?\s*\d*\s*min(?:ute)?s?\s+read\s*$/i;

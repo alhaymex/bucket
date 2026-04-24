@@ -17,7 +17,9 @@ import type * as links_actions from "../links/actions.js";
 import type * as links_mutations from "../links/mutations.js";
 import type * as links_queries from "../links/queries.js";
 import type * as users_mutations from "../users/mutations.js";
+import type * as utils_article from "../utils/article.js";
 import type * as utils_clerk from "../utils/clerk.js";
+import type * as utils_extractorClient from "../utils/extractorClient.js";
 import type * as utils_html from "../utils/html.js";
 import type * as utils_links from "../utils/links.js";
 
@@ -37,7 +39,9 @@ declare const fullApi: ApiFromModules<{
   "links/mutations": typeof links_mutations;
   "links/queries": typeof links_queries;
   "users/mutations": typeof users_mutations;
+  "utils/article": typeof utils_article;
   "utils/clerk": typeof utils_clerk;
+  "utils/extractorClient": typeof utils_extractorClient;
   "utils/html": typeof utils_html;
   "utils/links": typeof utils_links;
 }>;

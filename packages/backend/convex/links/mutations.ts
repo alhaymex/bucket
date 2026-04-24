@@ -1,9 +1,9 @@
+import { urlSchema } from "@bucket/common";
 import { v } from "convex/values";
+import { internal } from "../_generated/api";
 import { internalMutation, mutation } from "../_generated/server";
 import { getCurrentUserFromCtx } from "../auth";
-import { isUrl, normalizeUrl, urlSchema } from "@bucket/common";
 import { analyzeUrl } from "../utils/links";
-import { internal } from "../_generated/api";
 
 export const saveLink = mutation({
   args: {
@@ -22,8 +22,6 @@ export const saveLink = mutation({
     const parsedUrl = urlSchema.safeParse(args.url);
 
     if (!parsedUrl.success) throw new Error("Invalid Url!");
-
-    const normalizedUrl = normalizeUrl(parsedUrl.data);
 
     const analyzed = analyzeUrl(parsedUrl.data);
 
@@ -83,6 +81,8 @@ export const updateLinkOpenGraph = internalMutation({
     thumbnailUrl: v.optional(v.string()),
     siteName: v.optional(v.string()),
     html: v.optional(v.string()),
+    text: v.optional(v.string()),
+    readingTime: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
     await ctx.db.patch(args.linkId, {
@@ -102,6 +102,8 @@ export const updateLinkOpenGraph = internalMutation({
       linkId: args.linkId,
       siteName: args.siteName,
       html: args.html,
+      text: args.text,
+      readingTime: args.readingTime,
       images: args.thumbnailUrl ? [args.thumbnailUrl] : [],
       fetchedAt: Date.now(),
     };

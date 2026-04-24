@@ -5,8 +5,11 @@ const envSchema = z.object({
     .enum(["development", "test", "production"])
     .default("development"),
   CLERK_WEBHOOK_SIGNING_SECRET: z.string(),
+  EXTRACTOR_BASE_URL: z.url(),
+  EXTRACTOR_SHARED_SECRET: z.string().min(1),
 });
 
+// @ts-ignore
 const parsed = envSchema.safeParse(process.env);
 
 if (!parsed.success) {
