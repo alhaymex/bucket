@@ -12,9 +12,6 @@ Environment:
 - `NODE_ENV` (`development` by default)
 - `PORT` (default: `3001`)
 - `EXTRACTOR_SHARED_SECRET` (required)
-- `PUPPETEER_TIMEOUT_MS` (default: `30000`)
-- `PUPPETEER_MAX_CONCURRENCY` (default: `2`)
-- `CHROME_PATH` (optional)
 
 Generate a shared secret:
 
@@ -23,3 +20,5 @@ pnpm --filter @bucket/extractor generate:secret
 ```
 
 For later backend integration, the same secret will also need to be added to `packages/backend` as `EXTRACTOR_SHARED_SECRET`.
+
+Puppeteer settings should live in `src/config.ts` as code-level defaults instead of environment variables.
