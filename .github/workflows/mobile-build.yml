@@ -20,8 +20,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-      EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY }}
-      EXPO_PUBLIC_CONVEX_URL: ${{ secrets.EXPO_PUBLIC_CONVEX_URL }}
       EAS_NO_VCS: 1
 
     steps:
@@ -44,16 +42,6 @@ jobs:
         run: |
           if [ -z "$EXPO_TOKEN" ]; then
             echo "EXPO_TOKEN is not configured."
-            exit 1
-          fi
-
-          if [ -z "$EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY" ]; then
-            echo "EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY is not configured."
-            exit 1
-          fi
-
-          if [ -z "$EXPO_PUBLIC_CONVEX_URL" ]; then
-            echo "EXPO_PUBLIC_CONVEX_URL is not configured."
             exit 1
           fi
 
