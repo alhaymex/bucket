@@ -6,6 +6,7 @@ import { View } from "react-native";
 import { Skeleton } from "../ui/Skeleton";
 import { LinkScreenHeader } from "../LinkScreenHeader";
 import { EmbedView } from "../RenderEmbed";
+import { PDFView } from "../RenderPDF";
 
 export const ArticleSkeleton = () => {
   return (
@@ -59,7 +60,9 @@ export const ViewLinkScreen = ({ linkId }: { linkId: Id<"links"> }) => {
   return (
     <SafeAreaView className="flex-1 bg-bucket-background" edges={["top"]}>
       <LinkScreenHeader />
-      {data.link.renderType === "embed" ? (
+      {data.link.renderType === "pdf" ? (
+        <PDFView url={data.link.canonicalUrl} />
+      ) : data.link.renderType === "embed" ? (
         <EmbedView
           canonicalUrl={data.link.canonicalUrl}
           embedUrl={data.link.embedUrl}

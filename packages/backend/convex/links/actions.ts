@@ -80,6 +80,31 @@ const hasUsableArticleContent = (html: string | undefined) => {
   return text.length >= 200;
 };
 
+const resolveUrl = (value: string | undefined, baseUrl: string) => {
+  if (!value) return undefined;
+
+  try {
+    return new URL(value, baseUrl).toString();
+  } catch {
+    return value;
+  }
+};
+
+const getFilenameTitle = (url: string) => {
+  try {
+    const pathname = new URL(url).pathname;
+    const filename = pathname.split("/").filter(Boolean).at(-1);
+
+    if (!filename) return undefined;
+
+    return decodeURIComponent(filename)
+      .replace(/\.pdf$/i, "")
+      .trim();
+  } catch {
+    return undefined;
+  }
+};
+
 type OpenGraphActionCtx = Pick<ActionCtx, "runQuery" | "runMutation">;
 
 export const handleOpenGraph = async (
@@ -92,9 +117,12 @@ export const handleOpenGraph = async (
 
   if (!link) return;
 
-  if (link.renderType === "embed") {
+  if (link.renderType === "pdf") {
     await ctx.runMutation(internal.links.mutations.updateLinkOpenGraph, {
       linkId,
+      title: toOptionalString(getFilenameTitle(link.canonicalUrl)),
+      description: "PDF document",
+      faviconUrl: new URL("/favicon.ico", link.canonicalUrl).toString(),
     });
     return;
   }
@@ -125,18 +153,43 @@ export const handleOpenGraph = async (
       $(`meta[property="${name}"]`).attr("content") ||
       $(`meta[name="${name}"]`).attr("content");
 
+    const siteName = getMeta("og:site_name") || article?.siteName;
+    const favicon = resolveUrl(
+      $('link[rel~="icon"]').attr("href") ||
+        $('link[rel="shortcut icon"]').attr("href"),
+      link.canonicalUrl,
+    );
+    const fallbackFavicon = new URL(
+      "/favicon.ico",
+      link.canonicalUrl,
+    ).toString();
+    const image = resolveUrl(getMeta("og:image"), link.canonicalUrl);
+
+    if (link.renderType === "embed") {
+      await ctx.runMutation(internal.links.mutations.updateLinkOpenGraph, {
+        linkId,
+        title: toOptionalString(
+          normalizeTitle({
+            title: getMeta("og:title") || $("title").text(),
+            siteName,
+          }),
+        ),
+        description: toOptionalString(
+          getMeta("og:description") || getMeta("description"),
+        ),
+        thumbnailUrl: toOptionalString(image),
+        faviconUrl: favicon ?? fallbackFavicon,
+        siteName: toOptionalString(siteName),
+      });
+      return;
+    }
+
     const description = getMeta("og:description") || getMeta("description");
 
-    const image = getMeta("og:image");
-    const siteName = getMeta("og:site_name") || article?.siteName;
     const resolvedTitle = normalizeTitle({
       title: article?.title || getMeta("og:title") || $("title").text(),
       siteName,
     });
-
-    const favicon =
-      $('link[rel="icon"]').attr("href") ||
-      new URL("/favicon.ico", link.canonicalUrl).toString();
 
     const shouldUseExtractorFallback =
       !res.ok ||
@@ -176,7 +229,7 @@ export const handleOpenGraph = async (
               extractorResponse.excerpt || description || article?.excerpt,
             ),
             thumbnailUrl: toOptionalString(image),
-            faviconUrl: favicon,
+            faviconUrl: favicon ?? fallbackFavicon,
             siteName: toOptionalString(fallbackSiteName),
             html: toOptionalString(fallbackHtml),
             text: toOptionalString(fallbackText),
@@ -205,7 +258,7 @@ export const handleOpenGraph = async (
       title: toOptionalString(resolvedTitle),
       description: toOptionalString(description || article?.excerpt),
       thumbnailUrl: toOptionalString(image),
-      faviconUrl: favicon,
+      faviconUrl: favicon ?? fallbackFavicon,
       siteName: toOptionalString(siteName),
       html: toOptionalString(sanitizedHtml),
       text: toOptionalString(articleText),

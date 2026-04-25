@@ -20,8 +20,13 @@ type ProductPlatform = keyof typeof PRODUCT_HOSTS;
 
 export type Platform = EmbedPlatform | ProductPlatform | "generic";
 
-export type RenderType = "embed" | "reader";
-export type ContentType = "video" | "social" | "product" | "article";
+export type RenderType = "embed" | "reader" | "pdf";
+export type ContentType =
+  | "video"
+  | "social"
+  | "product"
+  | "article"
+  | "document";
 
 export const normalizeHost = (host: string) => {
   return host.replace(/^www\./, "").toLowerCase();
@@ -150,6 +155,10 @@ const getFacebookExternalId = (url: URL) => {
   );
 };
 
+const isPdfUrl = (url: URL) => {
+  return url.pathname.toLowerCase().endsWith(".pdf");
+};
+
 export const analyzeUrl = (url: string) => {
   const parsed = new URL(url);
   const sourceHost = normalizeHost(parsed.hostname);
@@ -157,6 +166,7 @@ export const analyzeUrl = (url: string) => {
 
   parsed.hash = "";
 
+  const isPdf = isPdfUrl(parsed);
   const isEmbed = platform in EMBED_HOSTS;
   const isProduct = platform in PRODUCT_HOSTS;
   const isFacebookVideo = platform === "facebook" && isFacebookVideoUrl(parsed);
@@ -232,9 +242,10 @@ export const analyzeUrl = (url: string) => {
     canonicalUrl,
     sourceHost,
     platform,
-    renderType: isEmbed ? "embed" : "reader",
-    contentType:
-      platform === "youtube" || platform === "tiktok" || isFacebookVideo
+    renderType: isPdf ? "pdf" : isEmbed ? "embed" : "reader",
+    contentType: isPdf
+      ? "document"
+      : platform === "youtube" || platform === "tiktok" || isFacebookVideo
         ? "video"
         : isEmbed
           ? "social"
