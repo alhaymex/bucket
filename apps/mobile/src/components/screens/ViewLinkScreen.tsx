@@ -5,6 +5,7 @@ import { useQuery } from "convex/react";
 import { View } from "react-native";
 import { Skeleton } from "../ui/Skeleton";
 import { LinkScreenHeader } from "../LinkScreenHeader";
+import { EmbedView } from "../RenderEmbed";
 
 export const ArticleSkeleton = () => {
   return (
@@ -58,11 +59,21 @@ export const ViewLinkScreen = ({ linkId }: { linkId: Id<"links"> }) => {
   return (
     <SafeAreaView className="flex-1 bg-bucket-background" edges={["top"]}>
       <LinkScreenHeader />
-      <ReaderHTML
-        canonicalUrl={data.link.canonicalUrl}
-        html={data.metadata?.html}
-        title={data.link.title}
-      />
+      {data.link.renderType === "embed" ? (
+        <EmbedView
+          canonicalUrl={data.link.canonicalUrl}
+          embedUrl={data.link.embedUrl}
+          externalId={data.link.externalId}
+          platform={data.link.platform}
+          title={data.link.title}
+        />
+      ) : (
+        <ReaderHTML
+          canonicalUrl={data.link.canonicalUrl}
+          html={data.metadata?.html}
+          title={data.link.title}
+        />
+      )}
     </SafeAreaView>
   );
 };

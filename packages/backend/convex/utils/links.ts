@@ -77,6 +77,79 @@ const getXPostId = (url: URL) => {
   return url.pathname.match(/\/status\/(\d+)/)?.[1];
 };
 
+const getXCanonicalPath = (url: URL) => {
+  const match = url.pathname.match(/^\/([^/]+)\/status\/(\d+)/);
+
+  if (!match) return undefined;
+
+  return `/${match[1]}/status/${match[2]}`;
+};
+
+const getInstagramPost = (url: URL) => {
+  const match = url.pathname.match(/^\/(p|reel|tv)\/([^/?#]+)/);
+
+  if (!match) return undefined;
+
+  return {
+    kind: match[1],
+    shortcode: match[2],
+  };
+};
+
+const getTikTokPostId = (url: URL) => {
+  const playerMatch = url.pathname.match(/^\/player\/v1\/(\d+)/);
+
+  if (playerMatch) return playerMatch[1];
+
+  return url.pathname.match(/^\/@[^/]+\/(?:video|photo)\/(\d+)/)?.[1];
+};
+
+const getTikTokCanonicalPath = (url: URL) => {
+  const match = url.pathname.match(/^\/(@[^/]+)\/(video|photo)\/(\d+)/);
+
+  if (!match) return undefined;
+
+  return `/${match[1]}/${match[2]}/${match[3]}`;
+};
+
+const getRedditPostId = (url: URL) => {
+  return url.pathname.match(/\/comments\/([a-z0-9]+)/i)?.[1];
+};
+
+const isFacebookVideoUrl = (url: URL) => {
+  return (
+    /\/videos\//.test(url.pathname) ||
+    url.pathname === "/watch/" ||
+    url.pathname === "/watch" ||
+    url.searchParams.has("v") ||
+    normalizeHost(url.hostname) === "fb.watch"
+  );
+};
+
+const isFacebookPostUrl = (url: URL) => {
+  return (
+    /\/posts\/\d+/.test(url.pathname) ||
+    url.pathname === "/permalink.php" ||
+    url.pathname === "/story.php" ||
+    url.searchParams.has("story_fbid") ||
+    url.searchParams.has("fbid")
+  );
+};
+
+const getFacebookExternalId = (url: URL) => {
+  const pathVideoId = url.pathname.match(/\/videos\/(\d+)/)?.[1];
+  const postId = url.pathname.match(/\/posts\/(\d+)/)?.[1];
+
+  return (
+    pathVideoId ??
+    postId ??
+    url.searchParams.get("v") ??
+    url.searchParams.get("story_fbid") ??
+    url.searchParams.get("fbid") ??
+    undefined
+  );
+};
+
 export const analyzeUrl = (url: string) => {
   const parsed = new URL(url);
   const sourceHost = normalizeHost(parsed.hostname);
@@ -86,6 +159,8 @@ export const analyzeUrl = (url: string) => {
 
   const isEmbed = platform in EMBED_HOSTS;
   const isProduct = platform in PRODUCT_HOSTS;
+  const isFacebookVideo = platform === "facebook" && isFacebookVideoUrl(parsed);
+  const isFacebookPost = platform === "facebook" && isFacebookPostUrl(parsed);
 
   let canonicalUrl = parsed.toString();
   let externalId: string | undefined;
@@ -104,7 +179,52 @@ export const analyzeUrl = (url: string) => {
     externalId = getXPostId(parsed);
 
     if (externalId) {
-      canonicalUrl = `https://x.com${parsed.pathname}`;
+      canonicalUrl = `https://x.com${
+        getXCanonicalPath(parsed) ?? `/i/web/status/${externalId}`
+      }`;
+    }
+  }
+
+  if (platform === "instagram") {
+    const post = getInstagramPost(parsed);
+
+    if (post) {
+      externalId = post.shortcode;
+      canonicalUrl = `https://www.instagram.com/${post.kind}/${post.shortcode}/`;
+      embedUrl = `https://www.instagram.com/${post.kind}/${post.shortcode}/embed`;
+    }
+  }
+
+  if (platform === "tiktok") {
+    externalId = getTikTokPostId(parsed);
+
+    if (externalId) {
+      const canonicalPath = getTikTokCanonicalPath(parsed);
+
+      canonicalUrl = canonicalPath
+        ? `https://www.tiktok.com${canonicalPath}`
+        : `https://www.tiktok.com/player/v1/${externalId}`;
+      embedUrl = `https://www.tiktok.com/player/v1/${externalId}`;
+    }
+  }
+
+  if (platform === "reddit") {
+    externalId = getRedditPostId(parsed);
+    canonicalUrl = `https://www.reddit.com${parsed.pathname}`;
+  }
+
+  if (platform === "facebook") {
+    externalId = getFacebookExternalId(parsed);
+    canonicalUrl = parsed.toString();
+
+    if (isFacebookVideo) {
+      embedUrl = `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(
+        canonicalUrl,
+      )}&show_text=false&width=500`;
+    } else if (isFacebookPost) {
+      embedUrl = `https://www.facebook.com/plugins/post.php?href=${encodeURIComponent(
+        canonicalUrl,
+      )}&show_text=true&width=500`;
     }
   }
 
@@ -114,7 +234,7 @@ export const analyzeUrl = (url: string) => {
     platform,
     renderType: isEmbed ? "embed" : "reader",
     contentType:
-      platform === "youtube"
+      platform === "youtube" || platform === "tiktok" || isFacebookVideo
         ? "video"
         : isEmbed
           ? "social"

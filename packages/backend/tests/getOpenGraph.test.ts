@@ -132,6 +132,28 @@ afterEach(() => {
 });
 
 describe("getOpenGraph fallback path", () => {
+  it("marks embed links ready without fetching article html", async () => {
+    const ctx = createTestContext();
+    ctx.runQuery.mockResolvedValue({
+      _id: "link_123",
+      canonicalUrl: "https://youtube.com/watch?v=abc123",
+      renderType: "embed",
+      embedUrl: "https://www.youtube.com/embed/abc123",
+    });
+
+    await handleOpenGraph(ctx as any, { linkId: "link_123" });
+
+    expect(globalThis.fetch).not.toHaveBeenCalled();
+    expect(ctx.runMutation).toHaveBeenCalledTimes(1);
+    const [, mutationArgs] = ctx.runMutation.mock.calls[0];
+
+    expect(mutationArgs).toMatchObject({
+      linkId: "link_123",
+    });
+    expect(mutationArgs).not.toHaveProperty("html");
+    expect(mutationArgs).not.toHaveProperty("embedHtml");
+  });
+
   it("calls the extractor when direct fetch is blocked and stores sanitized fallback content", async () => {
     const ctx = createTestContext();
 
