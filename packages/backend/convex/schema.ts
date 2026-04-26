@@ -41,10 +41,15 @@ export default defineSchema({
       v.literal("social"),
       v.literal("article"),
       v.literal("product"),
+      v.literal("document"),
       v.literal("generic"),
     ),
 
-    renderType: v.union(v.literal("embed"), v.literal("reader")),
+    renderType: v.union(
+      v.literal("embed"),
+      v.literal("reader"),
+      v.literal("pdf"),
+    ),
 
     // Open Graph
     title: v.optional(v.string()),

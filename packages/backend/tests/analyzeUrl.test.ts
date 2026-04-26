@@ -2,6 +2,23 @@ import { describe, expect, it } from "vitest";
 import { analyzeUrl } from "../convex/utils/links";
 
 describe("analyzeUrl", () => {
+  it("classifies PDF URLs as document links", () => {
+    expect(
+      analyzeUrl(
+        "https://sks.karabuk.edu.tr/yuklenen/dosyalar/126111201782731.pdf",
+      ),
+    ).toMatchObject({
+      canonicalUrl:
+        "https://sks.karabuk.edu.tr/yuklenen/dosyalar/126111201782731.pdf",
+      sourceHost: "sks.karabuk.edu.tr",
+      platform: "generic",
+      contentType: "document",
+      renderType: "pdf",
+      externalId: undefined,
+      embedUrl: undefined,
+    });
+  });
+
   it("normalizes YouTube videos to iframe embeds", () => {
     expect(analyzeUrl("https://youtu.be/abc123?t=30#watch")).toMatchObject({
       canonicalUrl: "https://youtube.com/watch?v=abc123",

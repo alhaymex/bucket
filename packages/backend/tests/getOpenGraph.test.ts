@@ -132,13 +132,13 @@ afterEach(() => {
 });
 
 describe("getOpenGraph fallback path", () => {
-  it("marks embed links ready without fetching article html", async () => {
+  it("marks PDF links ready with filename title and favicon without fetching article html", async () => {
     const ctx = createTestContext();
     ctx.runQuery.mockResolvedValue({
       _id: "link_123",
-      canonicalUrl: "https://youtube.com/watch?v=abc123",
-      renderType: "embed",
-      embedUrl: "https://www.youtube.com/embed/abc123",
+      canonicalUrl:
+        "https://sks.karabuk.edu.tr/yuklenen/dosyalar/126111201782731.pdf",
+      renderType: "pdf",
     });
 
     await handleOpenGraph(ctx as any, { linkId: "link_123" });
@@ -147,8 +147,51 @@ describe("getOpenGraph fallback path", () => {
     expect(ctx.runMutation).toHaveBeenCalledTimes(1);
     const [, mutationArgs] = ctx.runMutation.mock.calls[0];
 
-    expect(mutationArgs).toMatchObject({
+    expect(mutationArgs).toEqual({
       linkId: "link_123",
+      title: "126111201782731",
+      description: "PDF document",
+      faviconUrl: "https://sks.karabuk.edu.tr/favicon.ico",
+    });
+    expect(mutationArgs).not.toHaveProperty("html");
+  });
+
+  it("stores favicon metadata for embed links without storing article html", async () => {
+    const ctx = createTestContext();
+    ctx.runQuery.mockResolvedValue({
+      _id: "link_123",
+      canonicalUrl: "https://youtube.com/watch?v=abc123",
+      renderType: "embed",
+      embedUrl: "https://www.youtube.com/embed/abc123",
+    });
+    upstreamStatus = 200;
+    upstreamHtml = `
+      <html>
+        <head>
+          <title>Example Video - YouTube</title>
+          <meta property="og:title" content="Example Video" />
+          <meta property="og:description" content="Video description" />
+          <meta property="og:site_name" content="YouTube" />
+          <meta property="og:image" content="/thumb.jpg" />
+          <link rel="icon" href="/favicon.ico" />
+        </head>
+        <body></body>
+      </html>
+    `;
+
+    await handleOpenGraph(ctx as any, { linkId: "link_123" });
+
+    expect(globalThis.fetch).toHaveBeenCalled();
+    expect(ctx.runMutation).toHaveBeenCalledTimes(1);
+    const [, mutationArgs] = ctx.runMutation.mock.calls[0];
+
+    expect(mutationArgs).toEqual({
+      linkId: "link_123",
+      title: "Example Video",
+      description: "Video description",
+      thumbnailUrl: "https://youtube.com/thumb.jpg",
+      faviconUrl: "https://youtube.com/favicon.ico",
+      siteName: "YouTube",
     });
     expect(mutationArgs).not.toHaveProperty("html");
     expect(mutationArgs).not.toHaveProperty("embedHtml");
