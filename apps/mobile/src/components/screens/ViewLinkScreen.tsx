@@ -59,7 +59,7 @@ export const ViewLinkScreen = ({ linkId }: { linkId: Id<"links"> }) => {
 
   return (
     <SafeAreaView className="flex-1 bg-bucket-background" edges={["top"]}>
-      <LinkScreenHeader />
+      <LinkScreenHeader url={data.link.canonicalUrl} />
       {data.link.renderType === "pdf" ? (
         <PDFView url={data.link.canonicalUrl} />
       ) : data.link.renderType === "embed" ? (
