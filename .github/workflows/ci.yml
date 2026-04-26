@@ -5,6 +5,7 @@ on:
     branches:
       - preview
       - main
+      - dev
   pull_request:
 
 jobs:

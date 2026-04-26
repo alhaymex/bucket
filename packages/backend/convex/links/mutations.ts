@@ -45,6 +45,8 @@ export const saveLink = mutation({
       return existingLink._id;
     }
 
+    // TODO: check if link is already in the database
+
     const linkId = await ctx.db.insert("links", {
       userId: user._id,
       url: parsedUrl.data,
