@@ -4,11 +4,11 @@
     "slug": "bucket",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/app-icon-1024-light.png",
     "scheme": "bucket",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/expo.icon",
+      "icon": "./assets/images/app-icon-1024-light.png",
       "bundleIdentifier": "com.alhaymex.bucket",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
@@ -17,25 +17,29 @@
     "android": {
       "package": "com.alhaymex.bucket",
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+        "backgroundColor": "#FFFFFF",
+        "foregroundImage": "./assets/images/app-icon-1024-light.png",
+        "monochromeImage": "./assets/images/app-icon-1024-light.png"
       },
       "predictiveBackGestureEnabled": false
     },
     "web": {
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/favicon.ico"
     },
     "plugins": [
       "expo-router",
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#208AEF",
+          "image": "./assets/images/app-icon-512-light.png",
+          "backgroundColor": "#FFFFFF",
+          "dark": {
+            "image": "./assets/images/app-icon-512-dark.png",
+            "backgroundColor": "#000000"
+          },
           "android": {
-            "image": "./assets/images/splash-icon.png",
+            "image": "./assets/images/app-icon-512-light.png",
             "imageWidth": 76
           }
         }

@@ -113,11 +113,12 @@ export function ReaderHTML({ title, html, canonicalUrl }: ReaderWebViewProps) {
             a {
               color: ${colors.accent};
               text-decoration: none;
+              pointer-events: none;
+              cursor: default;
             }
 
             a[href^="#"] {
               color: inherit;
-              pointer-events: none;
             }
 
             a svg,
