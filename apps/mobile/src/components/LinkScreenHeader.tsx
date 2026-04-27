@@ -5,10 +5,11 @@ import React, { useCallback, useRef, useState } from "react";
 import { Animated, Linking, Pressable, Text, View } from "react-native";
 
 interface LinkScreenHeaderProps {
+  title: string;
   url: string;
 }
 
-export const LinkScreenHeader = ({ url }: LinkScreenHeaderProps) => {
+export const LinkScreenHeader = ({ url, title }: LinkScreenHeaderProps) => {
   const token = useColors();
   const router = useRouter();
   const [isPlaying, setIsPlaying] = useState(false);
@@ -48,7 +49,7 @@ export const LinkScreenHeader = ({ url }: LinkScreenHeaderProps) => {
               className="text-sm font-semibold text-bucket-foreground"
               numberOfLines={1}
             >
-              Article
+              {title}
             </Text>
             <Text
               className="text-xs text-bucket-muted-foreground"
