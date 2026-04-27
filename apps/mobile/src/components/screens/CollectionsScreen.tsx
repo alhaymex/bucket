@@ -61,7 +61,15 @@ export const CollectionsScreen = () => {
                 const isLast = i === systemCollections.length - 1;
                 return (
                   <View key={item._id}>
-                    <Pressable className="flex-row items-center gap-3 px-4 py-3.5">
+                    <Pressable
+                      className="flex-row items-center gap-3 px-4 py-3.5"
+                      onPress={() =>
+                        router.push({
+                          pathname: "/[collectionId]",
+                          params: { collectionId: item._id },
+                        })
+                      }
+                    >
                       <View className="h-9 w-9 items-center justify-center rounded-md ">
                         <Icon size={16} color={token.foreground} />
                       </View>
@@ -87,7 +95,7 @@ export const CollectionsScreen = () => {
             </Text>
 
             <Pressable
-              className="flex-row items-center gap-1.5 rounded-full bg-bucket-primary-subtle px-4 py-2 active:opacity-40"
+              className="flex-row items-center gap-1.5 rounded-full bg-bucket-primary-subtle px-4 py-2 active:opacity-50"
               onPress={() => router.push("/create-collection")}
             >
               <Plus size={13} color={token.primary} />
@@ -117,7 +125,15 @@ export const CollectionsScreen = () => {
                         <GripVertical color={token.mutedForeground} size={16} />
                       </View>
 
-                      <Pressable className="flex-1 flex-row items-center gap-3 py-3.5">
+                      <Pressable
+                        className="flex-1 flex-row items-center gap-3 py-3.5"
+                        onPress={() =>
+                          router.push({
+                            pathname: "/[collectionId]",
+                            params: { collectionId: collection._id },
+                          })
+                        }
+                      >
                         <View className="h-9 w-9 items-center justify-center">
                           <Icon size={16} color={token.foreground} />
                         </View>

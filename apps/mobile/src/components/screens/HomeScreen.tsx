@@ -39,39 +39,9 @@ export const HomeScreen = () => {
         contentContainerClassName="gap-8 px-5 py-6"
         showsVerticalScrollIndicator={false}
       >
-        <View className="rounded-2xl border border-bucket-border bg-bucket-muted overflow-hidden">
-          <Pressable className="flex-row items-center gap-3 px-4 py-3.5">
-            <View className="h-9 w-9 items-center justify-center">
-              <Inbox size={16} color={token.foreground} />
-            </View>
-            <Text className="flex-1 text-sm font-medium text-bucket-foreground">
-              Inbox
-            </Text>
-            <Text className="text-sm font-semibold text-bucket-muted-foreground">
-              24
-            </Text>
-            <ArrowUpRight size={14} color={token.mutedForeground} />
-          </Pressable>
-
-          <View className="ml-16 h-px bg-bucket-border" />
-
-          <Pressable className="flex-row items-center gap-3 px-4 py-3.5">
-            <View className="h-9 w-9 items-center justify-center">
-              <Sparkles size={16} color={token.foreground} />
-            </View>
-            <Text className="flex-1 text-sm font-medium text-bucket-foreground">
-              Ready to sort
-            </Text>
-            <Text className="text-sm font-semibold text-bucket-muted-foreground">
-              9
-            </Text>
-            <ArrowUpRight size={14} color={token.mutedForeground} />
-          </Pressable>
-        </View>
-
         <View className="gap-3">
           <Text className="text-xs font-semibold uppercase tracking-[1.4px] text-bucket-muted-foreground">
-            Continue
+            Recent
           </Text>
 
           <View className="gap-2">

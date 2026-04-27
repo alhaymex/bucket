@@ -150,7 +150,7 @@ export const OtpScreen = ({ email }: { email: string }) => {
                   disabled={!isComplete || loading}
                   className={cn(
                     "flex-row gap-2 h-14 items-center justify-center rounded-2xl bg-bucket-primary px-4 ",
-                    !isComplete || loading ? "opacity-40" : "",
+                    !isComplete || loading ? "opacity-50" : "",
                   )}
                   onPress={() => handleCodeSubmit(code)}
                 >

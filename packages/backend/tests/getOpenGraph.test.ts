@@ -47,6 +47,12 @@ let extractorResponse: ExtractorResponse = {
 let upstreamStatus = 403;
 let upstreamHtml =
   "<html><head><title>Just a moment...</title></head><body><h1>Just a moment...</h1></body></html>";
+let youtubeOEmbedStatus = 200;
+let youtubeOEmbedBody: Record<string, unknown> | null = {
+  title: "oEmbed Video Title",
+  author_name: "Video Author",
+  thumbnail_url: "https://i.ytimg.com/vi/abc123/maxresdefault.jpg",
+};
 let handleOpenGraph: typeof import("../convex/links/actions").handleOpenGraph;
 let closeExtractorServer: (() => Promise<void>) | undefined;
 
@@ -94,6 +100,12 @@ beforeEach(() => {
   upstreamStatus = 403;
   upstreamHtml =
     "<html><head><title>Just a moment...</title></head><body><h1>Just a moment...</h1></body></html>";
+  youtubeOEmbedStatus = 200;
+  youtubeOEmbedBody = {
+    title: "oEmbed Video Title",
+    author_name: "Video Author",
+    thumbnail_url: "https://i.ytimg.com/vi/abc123/maxresdefault.jpg",
+  };
 
   extractorResponse = {
     status: "ok",
@@ -116,6 +128,18 @@ beforeEach(() => {
 
     if (url.startsWith(extractorBaseUrl)) {
       return originalFetch(input as RequestInfo | URL, init);
+    }
+
+    if (url.startsWith("https://www.youtube.com/oembed")) {
+      return new Response(
+        youtubeOEmbedBody ? JSON.stringify(youtubeOEmbedBody) : "",
+        {
+          status: youtubeOEmbedStatus,
+          headers: {
+            "content-type": "application/json",
+          },
+        },
+      );
     }
 
     return new Response(upstreamHtml, {
@@ -161,6 +185,7 @@ describe("getOpenGraph fallback path", () => {
     ctx.runQuery.mockResolvedValue({
       _id: "link_123",
       canonicalUrl: "https://youtube.com/watch?v=abc123",
+      platform: "youtube",
       renderType: "embed",
       embedUrl: "https://www.youtube.com/embed/abc123",
     });
@@ -168,8 +193,8 @@ describe("getOpenGraph fallback path", () => {
     upstreamHtml = `
       <html>
         <head>
-          <title>Example Video - YouTube</title>
-          <meta property="og:title" content="Example Video" />
+          <title>- YouTube</title>
+          <meta property="og:title" content="- YouTube" />
           <meta property="og:description" content="Video description" />
           <meta property="og:site_name" content="YouTube" />
           <meta property="og:image" content="/thumb.jpg" />
@@ -187,14 +212,50 @@ describe("getOpenGraph fallback path", () => {
 
     expect(mutationArgs).toEqual({
       linkId: "link_123",
-      title: "Example Video",
+      title: "oEmbed Video Title",
       description: "Video description",
-      thumbnailUrl: "https://youtube.com/thumb.jpg",
+      thumbnailUrl: "https://i.ytimg.com/vi/abc123/maxresdefault.jpg",
       faviconUrl: "https://youtube.com/favicon.ico",
       siteName: "YouTube",
     });
     expect(mutationArgs).not.toHaveProperty("html");
     expect(mutationArgs).not.toHaveProperty("embedHtml");
+  });
+
+  it("falls back to HTML title when YouTube oEmbed fails", async () => {
+    const ctx = createTestContext();
+    ctx.runQuery.mockResolvedValue({
+      _id: "link_123",
+      canonicalUrl: "https://youtube.com/watch?v=abc123",
+      renderType: "embed",
+      embedUrl: "https://www.youtube.com/embed/abc123",
+      platform: "youtube",
+    });
+    youtubeOEmbedStatus = 404;
+    youtubeOEmbedBody = null;
+    upstreamStatus = 200;
+    upstreamHtml = `
+      <html>
+        <head>
+          <title>Example Video - YouTube</title>
+          <meta property="og:title" content="Example Video" />
+          <meta property="og:description" content="Video description" />
+          <meta property="og:site_name" content="YouTube" />
+          <meta property="og:image" content="/thumb.jpg" />
+          <link rel="icon" href="/favicon.ico" />
+        </head>
+        <body></body>
+      </html>
+    `;
+
+    await handleOpenGraph(ctx as any, { linkId: "link_123" });
+
+    const [, mutationArgs] = ctx.runMutation.mock.calls[0];
+
+    expect(mutationArgs).toMatchObject({
+      title: "Example Video",
+      thumbnailUrl: "https://youtube.com/thumb.jpg",
+    });
   });
 
   it("calls the extractor when direct fetch is blocked and stores sanitized fallback content", async () => {

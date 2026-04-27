@@ -12,6 +12,7 @@ import {
   normalizeArticleText,
 } from "../utils/article";
 import { sanitizeArticleHtml } from "../utils/html";
+import { fetchYouTubeOEmbed } from "../utils/youtube";
 
 const toOptionalString = (value: string | null | undefined) =>
   value ?? undefined;
@@ -163,17 +164,25 @@ export const handleOpenGraph = async (
       "/favicon.ico",
       link.canonicalUrl,
     ).toString();
-    const image = resolveUrl(getMeta("og:image"), link.canonicalUrl);
+    const htmlImage = resolveUrl(getMeta("og:image"), link.canonicalUrl);
+    const youtubeOEmbed =
+      link.platform === "youtube"
+        ? await fetchYouTubeOEmbed({
+            canonicalUrl: link.canonicalUrl,
+          })
+        : null;
+    const image = youtubeOEmbed?.thumbnailUrl ?? htmlImage;
+    const preferredTitle =
+      youtubeOEmbed?.title ||
+      normalizeTitle({
+        title: article?.title || getMeta("og:title") || $("title").text(),
+        siteName,
+      });
 
     if (link.renderType === "embed") {
       await ctx.runMutation(internal.links.mutations.updateLinkOpenGraph, {
         linkId,
-        title: toOptionalString(
-          normalizeTitle({
-            title: getMeta("og:title") || $("title").text(),
-            siteName,
-          }),
-        ),
+        title: toOptionalString(preferredTitle),
         description: toOptionalString(
           getMeta("og:description") || getMeta("description"),
         ),
@@ -185,11 +194,7 @@ export const handleOpenGraph = async (
     }
 
     const description = getMeta("og:description") || getMeta("description");
-
-    const resolvedTitle = normalizeTitle({
-      title: article?.title || getMeta("og:title") || $("title").text(),
-      siteName,
-    });
+    const resolvedTitle = preferredTitle;
 
     const shouldUseExtractorFallback =
       !res.ok ||
