@@ -87,7 +87,7 @@ export const CollectionsScreen = () => {
             </Text>
 
             <Pressable
-              className="flex-row items-center gap-1.5 rounded-full bg-bucket-primary-subtle px-4 py-2 active:opacity-40"
+              className="flex-row items-center gap-1.5 rounded-full bg-bucket-primary-subtle px-4 py-2 active:opacity-50"
               onPress={() => router.push("/create-collection")}
             >
               <Plus size={13} color={token.primary} />

@@ -40,7 +40,7 @@ export const getUserRecentLinks = query({
 
         return bTime - aTime;
       })
-      .slice(0, 6);
+      .slice(0, 8);
   },
 });
 

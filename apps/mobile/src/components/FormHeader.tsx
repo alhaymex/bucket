@@ -20,18 +20,20 @@ export const FormHeader = ({
   return (
     <View>
       <View className="flex-row items-center justify-between px-6 py-4">
-        <Pressable
-          onPress={onClose}
-          className="h-9 w-9 items-center justify-center rounded-full bg-bucket-muted"
-        >
-          <X size={16} color={token.foreground} />
-        </Pressable>
-        <Text className="text-base font-semibold text-bucket-foreground">
-          {title}
-        </Text>
+        <View className="flex-row items-center gap-3 flex-1 min-w-0">
+          <Pressable
+            onPress={onClose}
+            className="h-9 w-9 items-center justify-center rounded-full bg-bucket-muted"
+          >
+            <X size={16} color={token.foreground} />
+          </Pressable>
+          <Text className="text-base font-semibold text-bucket-foreground">
+            {title}
+          </Text>
+        </View>
         <Pressable
           disabled={!canSave}
-          className="rounded-full bg-bucket-primary px-4 py-2 disabled:opacity-40"
+          className="rounded-full bg-bucket-primary px-4 py-2 disabled:opacity-50"
           onPress={onSave}
         >
           <Text className="text-sm font-semibold text-bucket-primary-foreground">

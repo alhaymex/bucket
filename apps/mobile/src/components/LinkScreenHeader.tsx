@@ -1,7 +1,7 @@
 import { useColors } from "@/hooks/useColors";
 import { useRouter } from "expo-router";
-import { ArrowUpRight, Pause, Play, X } from "lucide-react-native";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import { ArrowUpRight, Pause, Play, Share, X } from "lucide-react-native";
+import React, { useCallback, useRef, useState } from "react";
 import { Animated, Linking, Pressable, Text, View } from "react-native";
 
 interface LinkScreenHeaderProps {
@@ -61,9 +61,12 @@ export const LinkScreenHeader = ({ url }: LinkScreenHeaderProps) => {
         </View>
 
         <View className="flex-row items-center gap-2 flex-shrink-0 ml-3">
+          <Pressable className="h-9 w-9 items-center justify-center rounded-full bg-bucket-muted opacity-50">
+            <Share size={14} color={token.foreground} fill={token.foreground} />
+          </Pressable>
           <Pressable
-            onPress={togglePlay}
-            className="h-9 w-9 items-center justify-center rounded-full bg-bucket-muted"
+            // onPress={togglePlay}
+            className="h-9 w-9 items-center justify-center rounded-full bg-bucket-muted opacity-50"
           >
             {isPlaying ? (
               <Pause
