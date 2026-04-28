@@ -4,6 +4,7 @@ import { useAuthFlowStore } from "@/store/authFlowStore";
 import { useSignUp } from "@clerk/expo";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
+import { usePostHog } from "posthog-react-native";
 import {
   ActivityIndicator,
   Alert,
@@ -26,6 +27,7 @@ export const OtpScreen = ({ email }: { email: string }) => {
   const { signUp } = useSignUp();
 
   const clearAuthFlowEmail = useAuthFlowStore((state) => state.clearEmail);
+  const posthog = usePostHog();
 
   const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
@@ -45,6 +47,13 @@ export const OtpScreen = ({ email }: { email: string }) => {
     try {
       await signUp.verifications.verifyEmailCode({ code: otpCode });
       if (signUp.status === "complete") {
+        posthog.capture("sign_up_completed", { method: "email" });
+        if (signUp.emailAddress) {
+          posthog.identify(signUp.emailAddress, {
+            $set: { email: signUp.emailAddress },
+            $set_once: { signup_date: new Date().toISOString() },
+          });
+        }
         await signUp.finalize({
           navigate: ({ session, decorateUrl }) => {
             if (session?.currentTask) return;

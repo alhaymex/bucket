@@ -21,11 +21,13 @@ import { useMutation } from "convex/react";
 import { api, Id } from "@bucket/backend";
 import { ConvexAddLinkSchema } from "@/schema/linkSchema";
 import { FormHeader } from "./FormHeader";
+import { usePostHog } from "posthog-react-native";
 
 export const AddLinkForm = () => {
   const token = useColors();
   const router = useRouter();
   const addLinkMutation = useMutation(api.links.mutations.saveLink);
+  const posthog = usePostHog();
 
   const {
     control,
@@ -75,6 +77,12 @@ export const AddLinkForm = () => {
         note: parsed.data.note,
       });
 
+      posthog.capture("link_saved", {
+        has_collection: Boolean(parsed.data.collectionId),
+        tag_count: parsed.data.tags?.length ?? 0,
+        has_note: Boolean(parsed.data.note),
+      });
+
       reset();
       router.back();
     } catch {
@@ -122,6 +130,7 @@ export const AddLinkForm = () => {
                 {clipboardUrl && (
                   <Pressable
                     onPress={() => {
+                      posthog.capture("link_pasted_from_clipboard");
                       setValue("url", clipboardUrl, {
                         shouldDirty: true,
                         shouldTouch: true,
