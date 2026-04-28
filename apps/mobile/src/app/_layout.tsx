@@ -1,5 +1,6 @@
 import "@/styles/global.css";
 
+import { Sentry } from "@/lib/sentry";
 import { ConvexProvider } from "@/providers/ConvexProvider";
 import { useAuth } from "@clerk/expo";
 import { Stack } from "expo-router";
@@ -54,10 +55,12 @@ const Routes = () => {
   );
 };
 
-export default function RootLayout() {
+function RootLayout() {
   return (
     <ConvexProvider>
       <Routes />
     </ConvexProvider>
   );
 }
+
+export default Sentry.wrap(RootLayout);

@@ -1,11 +1,9 @@
 import { LinkListItem } from "@/components/LinkListItem";
-import { useColors } from "@/hooks/useColors";
 import { api } from "@bucket/backend";
 import { useQuery } from "convex/react";
 import { useRouter } from "expo-router";
-import { ArrowUpRight, Inbox, Sparkles } from "lucide-react-native";
 import React from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Skeleton } from "../ui/Skeleton";
 
@@ -26,7 +24,6 @@ const LinkListSkeleton = ({ count = 5 }: { count?: number }) => {
 };
 
 export const HomeScreen = () => {
-  const token = useColors();
   const data = useQuery(api.links.queries.getUserRecentLinks);
   const router = useRouter();
 
