@@ -9,6 +9,7 @@ import { AlignLeft, Pencil } from "lucide-react-native";
 import { useMutation } from "convex/react";
 import { api } from "@bucket/backend";
 import { CollectionIconName, IconSelector } from "./IconSelector";
+import { usePostHog } from "posthog-react-native";
 
 export const CreateCollectionForm = () => {
   const token = useColors();
@@ -16,6 +17,7 @@ export const CreateCollectionForm = () => {
   const createCollectionMutation = useMutation(
     api.collections.mutations.createCollection,
   );
+  const posthog = usePostHog();
 
   const {
     control,
@@ -36,6 +38,11 @@ export const CreateCollectionForm = () => {
       name: form.name,
       description: form.description,
       icon: form.icon,
+    });
+
+    posthog.capture("collection_created", {
+      has_icon: Boolean(form.icon),
+      has_description: Boolean(form.description),
     });
 
     reset();

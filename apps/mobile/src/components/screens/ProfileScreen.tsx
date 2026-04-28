@@ -2,6 +2,7 @@ import { useColors } from "@/hooks/useColors";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@clerk/expo";
 import { useRouter } from "expo-router";
+import { usePostHog } from "posthog-react-native";
 import {
   Bell,
   ChevronRight,
@@ -57,6 +58,7 @@ const SETTINGS_GROUPS = [
 export const ProfileScreen = () => {
   const token = useColors();
   const router = useRouter();
+  const posthog = usePostHog();
 
   const { signOut } = useAuth();
 
@@ -124,7 +126,11 @@ export const ProfileScreen = () => {
 
         <Pressable
           className="flex-row items-center justify-center gap-2 rounded-2xl border border-bucket-border bg-bucket-muted px-4 py-4"
-          onPress={() => signOut()}
+          onPress={() => {
+            posthog.capture("user_signed_out");
+            posthog.reset();
+            signOut();
+          }}
         >
           <LogOut size={16} color={token.dead} />
           <Text className="text-sm font-semibold text-bucket-dead">

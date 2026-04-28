@@ -8,6 +8,7 @@ import { Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { collectionIconMap, CollectionIconName } from "../IconSelector";
 import { Skeleton } from "../ui/Skeleton";
+import { usePostHog } from "posthog-react-native";
 
 // TODO: use flatlist
 // Add dragging
@@ -31,6 +32,7 @@ const CollectionSkeleton = ({ count = 3 }: { count?: number }) => (
 export const CollectionsScreen = () => {
   const token = useColors();
   const router = useRouter();
+  const posthog = usePostHog();
   const collections = useQuery(api.collections.queries.getUserCollections);
 
   const systemCollections = collections?.filter((c) => c.type === "system");
@@ -63,12 +65,16 @@ export const CollectionsScreen = () => {
                   <View key={item._id}>
                     <Pressable
                       className="flex-row items-center gap-3 px-4 py-3.5"
-                      onPress={() =>
+                      onPress={() => {
+                        posthog.capture("collection_opened", {
+                          collection_type: "system",
+                          collection_name: item.name,
+                        });
                         router.push({
                           pathname: "/[collectionId]",
                           params: { collectionId: item._id },
-                        })
-                      }
+                        });
+                      }}
                     >
                       <View className="h-9 w-9 items-center justify-center rounded-md ">
                         <Icon size={16} color={token.foreground} />
@@ -127,12 +133,16 @@ export const CollectionsScreen = () => {
 
                       <Pressable
                         className="flex-1 flex-row items-center gap-3 py-3.5"
-                        onPress={() =>
+                        onPress={() => {
+                          posthog.capture("collection_opened", {
+                            collection_type: "user",
+                            collection_name: collection.name,
+                          });
                           router.push({
                             pathname: "/[collectionId]",
                             params: { collectionId: collection._id },
-                          })
-                        }
+                          });
+                        }}
                       >
                         <View className="h-9 w-9 items-center justify-center">
                           <Icon size={16} color={token.foreground} />

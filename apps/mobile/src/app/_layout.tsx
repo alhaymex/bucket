@@ -1,14 +1,30 @@
 import "@/styles/global.css";
 
 import { Sentry } from "@/lib/sentry";
+import { posthog } from "@/lib/posthog";
 import { ConvexProvider } from "@/providers/ConvexProvider";
 import { useAuth } from "@clerk/expo";
-import { Stack } from "expo-router";
+import { Stack, usePathname, useGlobalSearchParams } from "expo-router";
 import { useColors } from "@/hooks/useColors";
+import { PostHogProvider } from "posthog-react-native";
+import { useEffect, useRef } from "react";
 
 const Routes = () => {
   const token = useColors();
   const { isSignedIn, isLoaded } = useAuth();
+  const pathname = usePathname();
+  const params = useGlobalSearchParams();
+  const previousPathname = useRef<string | undefined>(undefined);
+
+  useEffect(() => {
+    if (previousPathname.current !== pathname) {
+      posthog.screen(pathname, {
+        previous_screen: previousPathname.current ?? null,
+        ...params,
+      });
+      previousPathname.current = pathname;
+    }
+  }, [pathname, params]);
 
   if (!isLoaded) {
     return null;
@@ -58,7 +74,16 @@ const Routes = () => {
 function RootLayout() {
   return (
     <ConvexProvider>
-      <Routes />
+      <PostHogProvider
+        client={posthog}
+        autocapture={{
+          captureScreens: true,
+          captureTouches: true,
+          propsToCapture: ["testID"],
+        }}
+      >
+        <Routes />
+      </PostHogProvider>
     </ConvexProvider>
   );
 }

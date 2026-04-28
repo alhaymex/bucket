@@ -4,10 +4,12 @@ import React from "react";
 import { useRouter } from "expo-router";
 import { Globe, Sun } from "lucide-react-native";
 import { useColors } from "@/hooks/useColors";
+import { usePostHog } from "posthog-react-native";
 
 const Welcome = () => {
   const router = useRouter();
   const token = useColors();
+  const posthog = usePostHog();
 
   return (
     <SafeAreaView className="flex-1 bg-bucket-background">
@@ -30,7 +32,10 @@ const Welcome = () => {
 
         <View className="gap-3 pb-2">
           <Pressable
-            onPress={() => router.push("/(auth)/sign-up")}
+            onPress={() => {
+              posthog.capture("get_started_tapped");
+              router.push("/(auth)/sign-up");
+            }}
             className="h-14 items-center justify-center rounded-2xl bg-bucket-primary"
           >
             <Text className="text-base font-semibold text-bucket-primary-foreground">
@@ -39,7 +44,10 @@ const Welcome = () => {
           </Pressable>
 
           <Pressable
-            onPress={() => router.push("/(auth)/sign-in")}
+            onPress={() => {
+              posthog.capture("sign_in_tapped");
+              router.push("/(auth)/sign-in");
+            }}
             className="h-14 items-center justify-center rounded-2xl border border-bucket-border"
           >
             <Text className="text-base font-semibold text-bucket-foreground">

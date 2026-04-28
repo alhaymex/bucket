@@ -22,6 +22,7 @@ import AppleLogoWhite from "@/assets/images/logos/apple-white.svg";
 import GoogleLogo from "@/assets/images/logos/google.svg";
 import { useSignUp, useSSO } from "@clerk/expo";
 import { useState } from "react";
+import { usePostHog } from "posthog-react-native";
 
 type AuthAction = "oauth_google" | "oauth_apple" | "email" | null;
 
@@ -41,8 +42,12 @@ export const SignUpScreen = () => {
   const token = useColors();
   const { colorScheme } = useColorScheme();
   const isDark = colorScheme === "dark";
+  const posthog = usePostHog();
 
   const handleOAuth = async (strategy: "oauth_google" | "oauth_apple") => {
+    posthog.capture("sign_up_oauth_started", {
+      method: strategy === "oauth_google" ? "google" : "apple",
+    });
     setActiveAction(strategy);
 
     try {
@@ -72,6 +77,7 @@ export const SignUpScreen = () => {
       return;
     }
 
+    posthog.capture("sign_up_email_submitted");
     setActiveAction("email");
 
     try {

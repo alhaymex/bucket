@@ -7,6 +7,8 @@ import { Skeleton } from "../ui/Skeleton";
 import { LinkScreenHeader } from "../LinkScreenHeader";
 import { EmbedView } from "../RenderEmbed";
 import { PDFView } from "../RenderPDF";
+import { usePostHog } from "posthog-react-native";
+import { useEffect } from "react";
 
 export const ArticleSkeleton = () => {
   return (
@@ -54,6 +56,18 @@ export const ViewLinkScreen = ({ linkId }: { linkId: Id<"links"> }) => {
   const data = useQuery(api.links.queries.getUserLinkById, {
     linkId,
   });
+  const posthog = usePostHog();
+
+  useEffect(() => {
+    if (data?.link) {
+      posthog.capture("link_viewed", {
+        render_type: data.link.renderType,
+        platform: data.link.platform ?? null,
+      });
+    }
+    // posthog is a stable singleton — excluded from deps intentionally
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data?.link]);
 
   if (data === undefined) return <ArticleSkeleton />;
 
