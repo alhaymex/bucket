@@ -11,6 +11,8 @@ import {
 import React from "react";
 import { Pressable, Text, View } from "react-native";
 
+// TODO: use the favicon instead of an icon
+
 type LinkContentType =
   | "youtube"
   | "article"
