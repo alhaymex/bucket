@@ -8,8 +8,8 @@
     "start:android": "expo start --android",
     "start:ios": "expo start --ios",
     "lint": "expo lint",
-    "build:preview": "npx eas-cli build --platform all --profile preview --non-interactive --no-wait",
-    "build:production": "npx eas-cli build --platform all --profile production --non-interactive --no-wait",
+    "build:preview": "npx eas-cli build --platform ios --profile preview --non-interactive --auto-submit",
+    "build:production": "npx eas-cli build --platform ios --profile production --non-interactive --auto-submit",
     "test": "node -e \"console.log('No tests defined for @bucket/mobile yet')\"",
     "typecheck": "tsc --noEmit"
   },

@@ -1,6 +1,12 @@
 name: Mobile Build
 
 on:
+  workflow_call:
+    inputs:
+      profile:
+        description: EAS build profile
+        required: true
+        type: string
   workflow_dispatch:
     inputs:
       profile:
@@ -19,12 +25,11 @@ on:
 jobs:
   eas-build:
     if: >
+      github.event_name == 'workflow_call' ||
       github.event_name == 'workflow_dispatch' || (
+        github.event_name == 'workflow_run' &&
         github.event.workflow_run.conclusion == 'success' &&
-        (
-          github.event.workflow_run.head_branch == 'preview' ||
-          github.event.workflow_run.head_branch == 'main'
-        )
+        github.event.workflow_run.head_branch == 'preview'
       )
     runs-on: ubuntu-latest
     env:
@@ -63,10 +68,8 @@ jobs:
       - name: Resolve build profile
         id: profile
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] || [ "${{ github.event_name }}" = "workflow_call" ]; then
             echo "value=${{ inputs.profile }}" >> "$GITHUB_OUTPUT"
-          elif [ "${{ github.event.workflow_run.head_branch }}" = "main" ]; then
-            echo "value=production" >> "$GITHUB_OUTPUT"
           else
             echo "value=preview" >> "$GITHUB_OUTPUT"
           fi
