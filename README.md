@@ -1,19 +1,29 @@
+<p align="center">
+  <picture>
+    <img src="./assets/logo-1024-light.png" alt="Bucket logo" width="160">
+  </picture>
+</p>
+
 # Bucket
 
-## Workspace Commands
+Bucket is an app that helps people save and view their links.
 
-- `pnpm lint` runs repo linting across all workspaces
-- `pnpm typecheck` runs TypeScript checks across all workspaces
-- `pnpm test` runs the workspace test pipeline
+It is built for the simple moments that usually turn into clutter: a post you want to revisit, an article you mean to read later, a PDF you need to keep, or a link you do not want to lose in chats and tabs.
 
-Current test coverage:
+## What Bucket Does
 
-- `@bucket/backend` runs Vitest integration tests
-- `@bucket/extractor` runs Vitest unit and route tests
-- `@bucket/common` and `@bucket/mobile` currently have explicit no-op `test` scripts until real test suites are added
+- Save links in one place
+- View saved content inside the app
+- Organize links into collections
+- Add notes and tags for context
+- Keep recent links easy to get back to
 
-## Roadmap
+## Product Direction
 
-- Improve rich embeds for social links, especially Facebook and Reddit posts.
-- Add a fallback preview card when a platform cannot provide a clean embed.
-- Expand embed metadata extraction so saved links can show better titles, authors, thumbnails, and source context.
+Bucket is focused on making link saving feel clean, fast, and useful.
+
+Instead of treating every URL like a bookmark list, it aims to make saved links feel readable, organized, and worth coming back to.
+
+## Documentation
+
+Technical and setup documentation will live in `docs/`.
