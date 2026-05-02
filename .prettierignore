@@ -1,3 +1,4 @@
 apps/mobile/.expo
+apps/mobile/CHANGELOG.md
 apps/mobile/expo-env.d.ts
 apps/mobile/nativewind-env.d.ts
