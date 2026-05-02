@@ -17,19 +17,9 @@ on:
         options:
           - preview
           - production
-  workflow_run:
-    workflows: ["CI"]
-    types:
-      - completed
 
 jobs:
   eas-build:
-    if: >
-      inputs.profile != '' || (
-        github.event_name == 'workflow_run' &&
-        github.event.workflow_run.conclusion == 'success' &&
-        github.event.workflow_run.head_branch == 'preview'
-      )
     runs-on: ubuntu-latest
     env:
       EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
@@ -67,11 +57,7 @@ jobs:
       - name: Resolve build profile
         id: profile
         run: |
-          if [ -n "${{ inputs.profile }}" ]; then
-            echo "value=${{ inputs.profile }}" >> "$GITHUB_OUTPUT"
-          else
-            echo "value=preview" >> "$GITHUB_OUTPUT"
-          fi
+          echo "value=${{ inputs.profile }}" >> "$GITHUB_OUTPUT"
 
       - name: Run EAS build
         run: |
