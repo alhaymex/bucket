@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/alhaymex/bucket/compare/mobile-v1.2.0...mobile-v1.3.0) (2026-05-02)
+
+
+### Features
+
+* adding CI concurrency and updated release-please ([13ed7e3](https://github.com/alhaymex/bucket/commit/13ed7e3e5bb4a91e612d0c54a4ee4b9d13034793))
+
 ## [1.2.0](https://github.com/alhaymex/bucket/compare/mobile-v1.1.0...mobile-v1.2.0) (2026-05-02)
 
 
