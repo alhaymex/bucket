@@ -1,8 +1,8 @@
 import { AddLinkSchema, urlSchema } from "@bucket/common";
-import { zid } from "convex-helpers/server/zod4";
+import { z } from "zod";
 
 export { urlSchema };
 
 export const ConvexAddLinkSchema = AddLinkSchema.extend({
-  collectionId: zid("collections"),
+  collectionId: z.string().min(1, "Select a collection."),
 });
