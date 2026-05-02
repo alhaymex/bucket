@@ -14,8 +14,8 @@ jobs:
   release-please:
     runs-on: ubuntu-latest
     outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
       mobile_release_created: ${{ steps.release.outputs['apps/mobile--release_created'] }}
-      mobile_release_body: ${{ steps.release.outputs['apps/mobile--body'] }}
 
     steps:
       - name: Run Release Please
@@ -26,11 +26,8 @@ jobs:
           manifest-file: .release-please-manifest.json
 
   mobile-production-build:
-    # Update to major release instead of breaking change
     needs: release-please
-    if: >
-      needs.release-please.outputs.mobile_release_created == 'true' &&
-      contains(needs.release-please.outputs.mobile_release_body, 'BREAKING CHANGES')
+    if: ${{ needs.release-please.outputs.release_created == 'true' }}
     uses: ./.github/workflows/mobile-build.yml
     with:
       profile: production
