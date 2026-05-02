@@ -1,5 +1,24 @@
 # Changelog
 
+## [1.3.0](https://github.com/alhaymex/bucket/compare/mobile-v1.2.0...mobile-v1.3.0) (2026-05-02)
+
+
+### Features
+
+* adding CI concurrency and updated release-please ([13ed7e3](https://github.com/alhaymex/bucket/commit/13ed7e3e5bb4a91e612d0c54a4ee4b9d13034793))
+
+## [1.2.0](https://github.com/alhaymex/bucket/compare/mobile-v1.1.0...mobile-v1.2.0) (2026-05-02)
+
+
+### Features
+
+* adding search ([10897b4](https://github.com/alhaymex/bucket/commit/10897b4c764249af98a9514fdb7ac15dd03f1d9a))
+
+
+### Bug Fixes
+
+* Header title color in light mode ([8587939](https://github.com/alhaymex/bucket/commit/858793983a3269cb8b5d86730e91a15b51bb412d))
+
 ## [1.1.0](https://github.com/alhaymex/bucket/compare/mobile-v1.0.0...mobile-v1.1.0) (2026-05-01)
 
 ### Features
