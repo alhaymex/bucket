@@ -5,6 +5,7 @@ import type { ActionCtx } from "../_generated/server";
 import { internalAction } from "../_generated/server";
 import * as cheerio from "cheerio";
 import { Readability } from "@mozilla/readability";
+import { urlSchema } from "@bucket/common";
 import { DOMParser } from "linkedom";
 import { callExtractor } from "../utils/extractorClient";
 import {
@@ -118,18 +119,27 @@ export const handleOpenGraph = async (
 
   if (!link) return;
 
+  const canonicalUrl = urlSchema.safeParse(link.canonicalUrl);
+
+  if (!canonicalUrl.success) {
+    await ctx.runMutation(internal.links.mutations.markLinkOpenGraphError, {
+      linkId,
+    });
+    return;
+  }
+
   if (link.renderType === "pdf") {
     await ctx.runMutation(internal.links.mutations.updateLinkOpenGraph, {
       linkId,
-      title: toOptionalString(getFilenameTitle(link.canonicalUrl)),
+      title: toOptionalString(getFilenameTitle(canonicalUrl.data)),
       description: "PDF document",
-      faviconUrl: new URL("/favicon.ico", link.canonicalUrl).toString(),
+      faviconUrl: new URL("/favicon.ico", canonicalUrl.data).toString(),
     });
     return;
   }
 
   try {
-    const res = await fetch(link.canonicalUrl, {
+    const res = await fetch(canonicalUrl.data, {
       headers: {
         "User-Agent": "Mozilla/5.0",
       },
@@ -145,7 +155,7 @@ export const handleOpenGraph = async (
     const sanitizedHtml = article?.content
       ? sanitizeArticleHtml({
           html: article.content,
-          baseUrl: link.canonicalUrl,
+          baseUrl: canonicalUrl.data,
         })
       : undefined;
     const articleText = normalizeArticleText(article?.textContent);
@@ -158,17 +168,17 @@ export const handleOpenGraph = async (
     const favicon = resolveUrl(
       $('link[rel~="icon"]').attr("href") ||
         $('link[rel="shortcut icon"]').attr("href"),
-      link.canonicalUrl,
+      canonicalUrl.data,
     );
     const fallbackFavicon = new URL(
       "/favicon.ico",
-      link.canonicalUrl,
+      canonicalUrl.data,
     ).toString();
-    const htmlImage = resolveUrl(getMeta("og:image"), link.canonicalUrl);
+    const htmlImage = resolveUrl(getMeta("og:image"), canonicalUrl.data);
     const youtubeOEmbed =
       link.platform === "youtube"
         ? await fetchYouTubeOEmbed({
-            canonicalUrl: link.canonicalUrl,
+            canonicalUrl: canonicalUrl.data,
           })
         : null;
     const image = youtubeOEmbed?.thumbnailUrl ?? htmlImage;
@@ -207,7 +217,7 @@ export const handleOpenGraph = async (
     if (shouldUseExtractorFallback) {
       try {
         const extractorResponse = await callExtractor({
-          url: link.canonicalUrl,
+          url: canonicalUrl.data,
         });
 
         if (
@@ -216,7 +226,7 @@ export const handleOpenGraph = async (
         ) {
           const fallbackHtml = sanitizeArticleHtml({
             html: extractorResponse.htmlFragment,
-            baseUrl: extractorResponse.finalUrl || link.canonicalUrl,
+            baseUrl: extractorResponse.finalUrl || canonicalUrl.data,
           });
           const fallbackSiteName = extractorResponse.siteName || siteName;
           const fallbackTitle = normalizeTitle({

@@ -14,7 +14,7 @@ export const slugify = (str: string): string => {
 };
 
 export const normalizeUrl = (url: string) => {
-  const parsed = new URL(url);
+  const parsed = new URL(urlSchema.parse(url));
 
   parsed.hash = "";
   parsed.hostname = parsed.hostname.replace(/^www\./, "");

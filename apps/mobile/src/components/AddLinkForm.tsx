@@ -37,6 +37,8 @@ export const AddLinkForm = () => {
     formState: { isValid, isDirty },
   } = useForm<AddLinkType>({
     resolver: zodResolver(ConvexAddLinkSchema),
+    mode: "onChange",
+    reValidateMode: "onChange",
     defaultValues: {
       url: "",
       note: "",
@@ -65,7 +67,10 @@ export const AddLinkForm = () => {
     const parsed = ConvexAddLinkSchema.safeParse(form);
 
     if (!parsed.success) {
-      Alert.alert("Invalid URL", "Please enter a valid URL.");
+      Alert.alert(
+        "Could not save link",
+        "Please enter a valid URL and choose a collection.",
+      );
       return;
     }
 
@@ -119,7 +124,7 @@ export const AddLinkForm = () => {
                 <TextInput
                   value={value}
                   onChangeText={onChange}
-                  placeholder="https://"
+                  placeholder="example.com or https://example.com"
                   placeholderTextColor={token.mutedForeground}
                   keyboardType="url"
                   autoCapitalize="none"
@@ -181,8 +186,8 @@ export const AddLinkForm = () => {
             <CollectionSelector
               onSelect={(id) => {
                 setValue("collectionId", id, {
-                  shouldDirty: value.length > 0,
-                  shouldTouch: value.length > 0,
+                  shouldDirty: true,
+                  shouldTouch: true,
                   shouldValidate: true,
                 });
               }}

@@ -1,4 +1,5 @@
 import { useColors } from "@/hooks/useColors";
+import { urlSchema } from "@bucket/common";
 import { useRouter } from "expo-router";
 import { ArrowUpRight, Pause, Play, Share, X } from "lucide-react-native";
 import React, { useCallback, useRef, useState } from "react";
@@ -27,6 +28,14 @@ export const LinkScreenHeader = ({ url, title }: LinkScreenHeaderProps) => {
   const togglePlay = useCallback(() => {
     setIsPlaying((prev) => !prev);
   }, []);
+
+  const openExternalUrl = useCallback(() => {
+    const parsedUrl = urlSchema.safeParse(url);
+
+    if (!parsedUrl.success) return;
+
+    Linking.openURL(parsedUrl.data);
+  }, [url]);
 
   const progressWidth = progressAnim.interpolate({
     inputRange: [0, 100],
@@ -85,7 +94,7 @@ export const LinkScreenHeader = ({ url, title }: LinkScreenHeaderProps) => {
           </Pressable>
 
           <Pressable
-            onPress={() => Linking.openURL(url)}
+            onPress={openExternalUrl}
             className="flex-row items-center gap-1 rounded-full bg-bucket-primary px-4 py-2"
           >
             <Text className="text-sm font-semibold text-bucket-primary-foreground">
