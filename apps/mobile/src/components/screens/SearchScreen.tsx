@@ -12,8 +12,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import type { SearchBarCommands } from "react-native-screens";
 import { Skeleton } from "../ui/Skeleton";
 
-const SUGGESTED_SEARCHES = ["Reading list", "Expo", "Design", "React Native"];
-
 type LinkListContentType = React.ComponentProps<
   typeof LinkListItem
 >["contentType"];
@@ -103,22 +101,6 @@ export const SearchScreen = () => {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          <View className="gap-3">
-            <View className="flex-row flex-wrap gap-2">
-              {SUGGESTED_SEARCHES.map((term) => (
-                <Pressable
-                  key={term}
-                  onPress={() => applySuggestedSearch(term)}
-                  className="rounded-full bg-bucket-primary-subtle px-3 py-2 active:opacity-70"
-                >
-                  <Text className="text-xs font-semibold text-bucket-primary">
-                    {term}
-                  </Text>
-                </Pressable>
-              ))}
-            </View>
-          </View>
-
           <View className="gap-3">
             <View className="flex-row items-center gap-3">
               <Text className="text-xs font-semibold uppercase tracking-[1.4px] text-bucket-muted-foreground">

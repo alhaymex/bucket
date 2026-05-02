@@ -14,7 +14,6 @@ jobs:
   release-please:
     runs-on: ubuntu-latest
     outputs:
-      release_created: ${{ steps.release.outputs.release_created }}
       mobile_release_created: ${{ steps.release.outputs['apps/mobile--release_created'] }}
 
     steps:
@@ -27,7 +26,7 @@ jobs:
 
   mobile-production-build:
     needs: release-please
-    if: ${{ needs.release-please.outputs.release_created == 'true' }}
+    if: ${{ needs.release-please.outputs.mobile_release_created == 'true' }}
     uses: ./.github/workflows/mobile-build.yml
     with:
       profile: production
