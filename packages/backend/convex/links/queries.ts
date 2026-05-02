@@ -2,6 +2,15 @@ import { v } from "convex/values";
 import { internalQuery, query } from "../_generated/server";
 import { getCurrentUserFromCtx } from "../auth";
 
+const linkContentType = v.union(
+  v.literal("video"),
+  v.literal("social"),
+  v.literal("article"),
+  v.literal("product"),
+  v.literal("document"),
+  v.literal("generic"),
+);
+
 export const getUserRecentLinks = query({
   args: {},
   handler: async (ctx) => {
@@ -41,6 +50,45 @@ export const getUserRecentLinks = query({
         return bTime - aTime;
       })
       .slice(0, 8);
+  },
+});
+
+export const searchUserLinks = query({
+  args: {
+    query: v.string(),
+    contentType: v.optional(linkContentType),
+    tags: v.optional(v.array(v.string())),
+    limit: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const user = await getCurrentUserFromCtx(ctx);
+
+    if (!user) throw new Error("Unauthorized!");
+
+    const searchQuery = args.query.trim();
+
+    if (!searchQuery) {
+      return [];
+    }
+
+    const limit = Math.min(Math.max(args.limit ?? 20, 1), 50);
+
+    return await ctx.db
+      .query("links")
+      .withSearchIndex("search_links", (q) => {
+        const filtered = q.search("title", searchQuery).eq("userId", user._id);
+
+        if (args.contentType) {
+          return filtered.eq("contentType", args.contentType);
+        }
+
+        if (args.tags && args.tags.length > 0) {
+          return filtered.eq("tags", args.tags);
+        }
+
+        return filtered;
+      })
+      .take(limit);
   },
 });
 
