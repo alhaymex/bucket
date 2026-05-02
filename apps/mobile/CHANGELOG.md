@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.0](https://github.com/alhaymex/bucket/compare/mobile-v0.2.0...mobile-v0.3.0) (2026-05-02)
+
+
+### Features
+
+* Harden URL validation and normalization ([0215498](https://github.com/alhaymex/bucket/commit/0215498f18857d323248344b4fd1dc61877e9d4b))
+
 ## [0.2.0](https://github.com/alhaymex/bucket/compare/mobile-v0.1.0...mobile-v0.2.0) (2026-05-02)
 
 
