@@ -1,6 +1,8 @@
 export {
   urlSchema,
   AddLinkSchema,
+  isPublicIpHostname,
+  isPublicUrlHostname,
   type AddLinkType,
 } from "./schema/linkSchema";
 
@@ -20,3 +22,4 @@ export {
 
 export { isUrl, slugify, normalizeUrl } from "./utils";
 export { hasUsableArticleContent } from "./utils/article";
+export { looksLikeBlockedPage } from "./utils/blockedPage";

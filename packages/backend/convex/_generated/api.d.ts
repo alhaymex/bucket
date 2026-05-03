@@ -22,6 +22,7 @@ import type * as utils_clerk from "../utils/clerk.js";
 import type * as utils_extractorClient from "../utils/extractorClient.js";
 import type * as utils_html from "../utils/html.js";
 import type * as utils_links from "../utils/links.js";
+import type * as utils_safeFetch from "../utils/safeFetch.js";
 import type * as utils_youtube from "../utils/youtube.js";
 
 import type {
@@ -45,6 +46,7 @@ declare const fullApi: ApiFromModules<{
   "utils/extractorClient": typeof utils_extractorClient;
   "utils/html": typeof utils_html;
   "utils/links": typeof utils_links;
+  "utils/safeFetch": typeof utils_safeFetch;
   "utils/youtube": typeof utils_youtube;
 }>;
 

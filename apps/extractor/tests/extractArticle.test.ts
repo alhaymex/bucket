@@ -168,6 +168,58 @@ describe("extractArticle", () => {
     expect(browser.close).toHaveBeenCalledTimes(1);
   });
 
+  it("returns blocked for one-hit anti-bot page titles before storing readable-looking content", async () => {
+    const { page, browser } = createBrowserDouble();
+    launchBrowserMock.mockResolvedValue(browser);
+    page.title.mockResolvedValue("Access Denied");
+    page.content.mockResolvedValue(
+      `<html><body><article><p>${"A".repeat(300)}</p></article></body></html>`,
+    );
+    extractReadableArticleMock.mockReturnValue({
+      title: "Example Article",
+      content: `<article><p>${"A".repeat(300)}</p></article>`,
+      textContent: "A".repeat(300),
+    });
+
+    const response = await extractArticle({
+      url: "https://example.com/source",
+    });
+
+    expect(response).toEqual({
+      status: "blocked",
+      finalUrl: "https://example.com/final",
+      errorCode: "ANTI_BOT_PAGE",
+      errorMessage: "Rendered page still appears blocked",
+    });
+    expect(extractReadableArticleMock).not.toHaveBeenCalled();
+    expect(browser.close).toHaveBeenCalledTimes(1);
+  });
+
+  it("returns blocked when readability extracts challenge content from a benign shell", async () => {
+    const { page, browser } = createBrowserDouble();
+    launchBrowserMock.mockResolvedValue(browser);
+    page.content.mockResolvedValue(
+      `<html><body><main>${"Loading ".repeat(40)}</main></body></html>`,
+    );
+    extractReadableArticleMock.mockReturnValue({
+      title: "Just a moment",
+      content: `<article><p>${"Checking if the site connection is secure. ".repeat(20)}</p></article>`,
+      textContent: "Checking if the site connection is secure. ".repeat(20),
+    });
+
+    const response = await extractArticle({
+      url: "https://example.com/source",
+    });
+
+    expect(response).toEqual({
+      status: "blocked",
+      finalUrl: "https://example.com/final",
+      errorCode: "ANTI_BOT_PAGE",
+      errorMessage: "Rendered page still appears blocked",
+    });
+    expect(browser.close).toHaveBeenCalledTimes(1);
+  });
+
   it("blocks heavy resource requests and keeps document requests flowing", async () => {
     const { browser, requestHandlers } = createBrowserDouble();
     launchBrowserMock.mockResolvedValue(browser);

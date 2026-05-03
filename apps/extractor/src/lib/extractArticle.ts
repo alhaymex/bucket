@@ -1,5 +1,6 @@
 import {
   hasUsableArticleContent,
+  looksLikeBlockedPage,
   type ExtractArticleResponse,
 } from "@bucket/common";
 import { extractorConfig } from "../config";
@@ -14,46 +15,6 @@ const BLOCKED_RESOURCE_TYPES = new Set<string>([
   "object",
   "texttrack",
 ]);
-
-const BLOCKED_PAGE_PATTERNS = [
-  /just a moment/i,
-  /verify you are human/i,
-  /attention required/i,
-  /checking your browser/i,
-  /please stand by/i,
-  /enable javascript and cookies to continue/i,
-  /captcha/i,
-  /access denied/i,
-  /cf-browser-verification/i,
-  /challenge-platform/i,
-  /cloudflare/i,
-] as const;
-
-const BLOCKED_URL_PATTERNS = [
-  /\/cdn-cgi\/challenge-platform/i,
-  /\/cdn-cgi\/l\/chk_jschl/i,
-] as const;
-
-const looksBlocked = ({
-  title,
-  finalUrl,
-  html,
-}: {
-  title: string | null | undefined;
-  finalUrl: string;
-  html: string;
-}) => {
-  if (BLOCKED_URL_PATTERNS.some((pattern) => pattern.test(finalUrl))) {
-    return true;
-  }
-
-  const signals = `${title ?? ""}\n${html.slice(0, 8000)}`;
-  const signalCount = BLOCKED_PAGE_PATTERNS.filter((pattern) =>
-    pattern.test(signals),
-  ).length;
-
-  return signalCount >= 2;
-};
 
 const enableLightweightPageMode = async (
   page: Awaited<ReturnType<typeof launchBrowser>> extends {
@@ -104,9 +65,12 @@ export const extractArticle = async ({
   url: string;
   timeoutMs?: number;
 }): Promise<ExtractArticleResponse> => {
-  const browser = await launchBrowser();
+  console.log("[extractArticle] starting", { url, timeoutMs });
 
+  let browser;
   try {
+    browser = await launchBrowser();
+    console.log("[extractArticle] browser launched");
     const page = await browser.newPage();
     const navigationTimeout = timeoutMs ?? extractorConfig.puppeteer.timeoutMs;
 
@@ -116,22 +80,119 @@ export const extractArticle = async ({
       "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
     );
 
+    console.log("[extractArticle] navigating", { url, navigationTimeout });
     await page.goto(url, {
       waitUntil: "domcontentloaded",
       timeout: navigationTimeout,
     });
+    console.log("[extractArticle] navigation complete, waiting for settle");
 
     await waitForPageToSettle(page, navigationTimeout);
+    console.log("[extractArticle] page settled");
 
     const html = await page.content();
     const finalUrl = page.url();
     const title = await page.title().catch(() => null);
+
+    console.log("[extractArticle] page content retrieved", {
+      finalUrl,
+      title,
+      htmlLength: html.length,
+      htmlSnippet: html.slice(0, 500),
+    });
+
+    // Diagnostic: log which blocked-page patterns match
+    const bodySignals = html.slice(0, 8000);
+    const allPatterns = [
+      /\/cdn-cgi\/challenge-platform/i,
+      /\/cdn-cgi\/l\/chk_jschl/i,
+      /\/sorry\/index/i,
+      /\/challenge\//i,
+      /\/captcha/i,
+      /just a moment/i,
+      /verify (that )?you are human/i,
+      /are you a human/i,
+      /attention required/i,
+      /checking your browser/i,
+      /checking if the site connection is secure/i,
+      /please stand by/i,
+      /enable javascript and cookies to continue/i,
+      /access denied/i,
+      /access to this page has been denied/i,
+      /unusual traffic/i,
+      /security check/i,
+      /browser check/i,
+      /captcha/i,
+      /cf-browser-verification/i,
+      /challenge-platform/i,
+      /g-recaptcha/i,
+      /hcaptcha/i,
+      /turnstile/i,
+      /ddos-guard/i,
+      /cloudflare/i,
+      /ray id/i,
+      /enable cookies/i,
+      /enable javascript/i,
+      /requires javascript/i,
+      /bot detection/i,
+      /automated requests/i,
+    ];
+    const matchedPatterns = allPatterns.filter(
+      (p) => p.test(title ?? "") || p.test(bodySignals),
+    );
+    if (matchedPatterns.length > 0) {
+      console.warn("[extractArticle] patterns that matched", {
+        url,
+        matched: matchedPatterns.map((p) => p.source),
+      });
+    }
+
+    if (looksLikeBlockedPage({ title, finalUrl, html })) {
+      console.warn("[extractArticle] blocked page detected (pre-readability)", {
+        url,
+        finalUrl,
+        title,
+      });
+      return {
+        status: "blocked",
+        finalUrl,
+        errorCode: "ANTI_BOT_PAGE",
+        errorMessage: "Rendered page still appears blocked",
+      };
+    }
+
     const article = extractReadableArticle({
       html,
       url: finalUrl,
     });
 
-    if (looksBlocked({ title: article?.title ?? title, finalUrl, html })) {
+    console.log("[extractArticle] readability result", {
+      url,
+      hasArticle: !!article,
+      articleTitle: article?.title ?? null,
+      contentLength: article?.content?.length ?? 0,
+      textContentLength: article?.textContent?.length ?? 0,
+      siteName: article?.siteName ?? null,
+      textSnippet: article?.textContent?.slice(0, 500) ?? null,
+      htmlSnippet: article?.content?.slice(0, 500) ?? null,
+    });
+
+    if (
+      looksLikeBlockedPage({
+        title: article?.title ?? title,
+        finalUrl,
+        html: article?.content ?? html,
+        text: article?.textContent,
+      })
+    ) {
+      console.warn(
+        "[extractArticle] blocked page detected (post-readability)",
+        {
+          url,
+          finalUrl,
+          title: article?.title ?? title,
+        },
+      );
       return {
         status: "blocked",
         finalUrl,
@@ -141,6 +202,12 @@ export const extractArticle = async ({
     }
 
     if (!article || !hasUsableArticleContent(article.content)) {
+      console.warn("[extractArticle] unreadable content", {
+        url,
+        finalUrl,
+        hasArticle: !!article,
+        contentLength: article?.content?.length ?? 0,
+      });
       return {
         status: "unreadable",
         finalUrl,
@@ -148,6 +215,12 @@ export const extractArticle = async ({
         errorMessage: "Rendered page did not produce readable article content",
       };
     }
+
+    console.log("[extractArticle] success", {
+      url,
+      finalUrl,
+      title: article.title,
+    });
 
     return {
       status: "ok",
@@ -161,6 +234,11 @@ export const extractArticle = async ({
       htmlFragment: article.content ?? undefined,
     };
   } catch (error) {
+    console.error("[extractArticle] extraction failed", {
+      url,
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+    });
     return {
       status: "error",
       errorCode: "EXTRACTION_FAILED",
@@ -168,6 +246,8 @@ export const extractArticle = async ({
         error instanceof Error ? error.message : "Unknown extraction error",
     };
   } finally {
-    await browser.close();
+    if (browser) {
+      await browser.close();
+    }
   }
 };
