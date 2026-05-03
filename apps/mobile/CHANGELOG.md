@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.0](https://github.com/alhaymex/bucket/compare/mobile-v0.3.0...mobile-v0.4.0) (2026-05-03)
+
+
+### Features
+
+* enhance sharing functionality and improve link handling ([#27](https://github.com/alhaymex/bucket/issues/27)) ([ea4b5f0](https://github.com/alhaymex/bucket/commit/ea4b5f0589fd5d1b122459c184f917c779b9d1cf))
+
 ## [0.3.0](https://github.com/alhaymex/bucket/compare/mobile-v0.2.0...mobile-v0.3.0) (2026-05-02)
 
 
