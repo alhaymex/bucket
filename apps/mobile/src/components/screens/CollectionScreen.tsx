@@ -75,8 +75,10 @@ export const CollectionScreen = ({
             <LinkListItem
               title={link.title}
               url={link.url}
-              contentType="article"
-              lastViewedAt={link.lastViewedAt ?? Date.now()}
+              faviconUrl={link.faviconUrl}
+              contentType={link.contentType}
+              readingTime={link.readingTime}
+              lastViewedAt={link.lastViewedAt ?? link._creationTime}
               onPress={() => {
                 router.push({
                   pathname: "/view/[linkId]",

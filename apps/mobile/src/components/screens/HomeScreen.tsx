@@ -50,8 +50,10 @@ export const HomeScreen = () => {
                   key={link._id}
                   title={link.title}
                   url={link.url}
-                  contentType="generic"
-                  lastViewedAt={link.lastViewedAt!}
+                  faviconUrl={link.faviconUrl}
+                  contentType={link.contentType}
+                  readingTime={link.readingTime}
+                  lastViewedAt={link.lastViewedAt ?? link._creationTime}
                   onPress={() => {
                     router.push({
                       pathname: "/view/[linkId]",
