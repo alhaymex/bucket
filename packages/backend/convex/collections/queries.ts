@@ -1,6 +1,27 @@
 import { v } from "convex/values";
 import { query } from "../_generated/server";
+import type { Id } from "../_generated/dataModel";
+import type { QueryCtx } from "../_generated/server";
 import { getCurrentUserFromCtx } from "../auth";
+
+const withReadingTime = async <Link extends { _id: Id<"links"> }>(
+  ctx: QueryCtx,
+  links: Link[],
+) => {
+  return await Promise.all(
+    links.map(async (link) => {
+      const metadata = await ctx.db
+        .query("link_metadata")
+        .withIndex("by_link", (q) => q.eq("linkId", link._id))
+        .unique();
+
+      return {
+        ...link,
+        readingTime: metadata?.readingTime,
+      };
+    }),
+  );
+};
 
 export const getUserCollections = query({
   args: {},
@@ -48,6 +69,6 @@ export const getCollectionById = query({
       )
       .collect();
 
-    return { ...collection, links };
+    return { ...collection, links: await withReadingTime(ctx, links) };
   },
 });

@@ -7,14 +7,10 @@ import type {
   TextInputFocusEventData,
 } from "react-native";
 import React from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import type { SearchBarCommands } from "react-native-screens";
 import { Skeleton } from "../ui/Skeleton";
-
-type LinkListContentType = React.ComponentProps<
-  typeof LinkListItem
->["contentType"];
 
 const LinkListSkeleton = ({ count = 5 }: { count?: number }) => {
   return (
@@ -30,30 +26,6 @@ const LinkListSkeleton = ({ count = 5 }: { count?: number }) => {
       ))}
     </View>
   );
-};
-
-const getLinkListContentType = (
-  contentType:
-    | "video"
-    | "social"
-    | "article"
-    | "product"
-    | "document"
-    | "generic",
-): LinkListContentType => {
-  switch (contentType) {
-    case "video":
-      return "youtube";
-    case "social":
-      return "tweet";
-    case "product":
-      return "product";
-    case "article":
-    case "document":
-      return "article";
-    default:
-      return "generic";
-  }
 };
 
 export const SearchScreen = () => {
@@ -76,11 +48,6 @@ export const SearchScreen = () => {
     },
     [],
   );
-
-  const applySuggestedSearch = React.useCallback((term: string) => {
-    setQuery(term);
-    searchBarRef.current?.setText(term);
-  }, []);
 
   return (
     <>
@@ -135,7 +102,9 @@ export const SearchScreen = () => {
                     key={link._id}
                     title={link.title}
                     url={link.url}
-                    contentType={getLinkListContentType(link.contentType)}
+                    faviconUrl={link.faviconUrl}
+                    contentType={link.contentType}
+                    readingTime={link.readingTime}
                     lastViewedAt={link.lastViewedAt ?? link._creationTime}
                     onPress={() => {
                       router.push({

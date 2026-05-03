@@ -1,58 +1,26 @@
 import { useColors } from "@/hooks/useColors";
 import { timeAgo } from "@/lib/date";
-import {
-  Code,
-  FileText,
-  MessageCircle,
-  Newspaper,
-  Play,
-  ShoppingBag,
-} from "lucide-react-native";
+import { Image } from "expo-image";
+import { Link as LinkIcon } from "lucide-react-native";
 import React from "react";
 import { Pressable, Text, View } from "react-native";
 
-// TODO: use the favicon instead of an icon
-
 type LinkContentType =
-  | "youtube"
+  | "video"
+  | "social"
   | "article"
   | "product"
-  | "tweet"
-  | "github"
+  | "document"
   | "generic";
 
 type LinkListItemProps = {
   title?: string;
   url: string;
+  faviconUrl?: string;
   contentType: LinkContentType;
+  readingTime?: number;
   lastViewedAt: number;
   onPress?: () => void;
-};
-
-const typeLabelMap: Record<LinkContentType, string> = {
-  youtube: "Video",
-  article: "Article",
-  product: "Product",
-  tweet: "Tweet",
-  github: "Repo",
-  generic: "Link",
-};
-
-const getTypeIcon = (type: LinkContentType, color: string) => {
-  switch (type) {
-    case "youtube":
-      return <Play size={18} color={color} />;
-    case "article":
-      return <Newspaper size={18} color={color} />;
-    case "product":
-      return <ShoppingBag size={18} color={color} />;
-    case "tweet":
-      return <MessageCircle size={18} color={color} />;
-    case "github":
-      return <Code size={18} color={color} />;
-    default:
-      return <FileText size={18} color={color} />;
-  }
 };
 
 const getSourceFromUrl = (url: string) => {
@@ -63,25 +31,53 @@ const getSourceFromUrl = (url: string) => {
   }
 };
 
+const Favicon = ({ faviconUrl }: { faviconUrl?: string }) => {
+  const token = useColors();
+  const [didFail, setDidFail] = React.useState(false);
+  const shouldShowImage = Boolean(faviconUrl && !didFail);
+
+  React.useEffect(() => {
+    setDidFail(false);
+  }, [faviconUrl]);
+
+  return (
+    <View className="h-10 w-10 shrink-0 items-center justify-center overflow-hidden">
+      {shouldShowImage ? (
+        <Image
+          source={{ uri: faviconUrl }}
+          contentFit="contain"
+          transition={120}
+          onError={() => setDidFail(true)}
+          style={{ height: 24, width: 24 }}
+        />
+      ) : (
+        <LinkIcon size={20} color={token.mutedForeground ?? "#666"} />
+      )}
+    </View>
+  );
+};
+
 export const LinkListItem = ({
   title,
   url,
+  faviconUrl,
   contentType,
+  readingTime,
   lastViewedAt,
   onPress,
 }: LinkListItemProps) => {
-  const token = useColors();
-
   const source = getSourceFromUrl(url);
+  const readingTimeLabel =
+    readingTime === undefined
+      ? undefined
+      : `${Math.max(1, Math.round(readingTime))} min`;
 
   return (
     <Pressable
       onPress={onPress}
       className="flex-row items-start gap-3 px-4 py-3 active:opacity-70"
     >
-      <View className="h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-bucket-secondary">
-        {getTypeIcon(contentType, token.mutedForeground || "#666")}
-      </View>
+      <Favicon faviconUrl={faviconUrl} />
 
       <View className="min-w-0 flex-1">
         <Text
@@ -93,10 +89,20 @@ export const LinkListItem = ({
 
         <View className="mt-1.5 flex-row items-center gap-2">
           <Text className="text-[11px] font-medium uppercase tracking-wide text-bucket-muted-foreground">
-            {typeLabelMap[contentType]}
+            {contentType.toUpperCase()}
           </Text>
 
           <Text className="text-xs text-bucket-muted-foreground">•</Text>
+
+          {readingTimeLabel && (
+            <>
+              <Text className="shrink-0 text-sm text-bucket-muted-foreground">
+                {readingTimeLabel}
+              </Text>
+
+              <Text className="text-xs text-bucket-muted-foreground">•</Text>
+            </>
+          )}
 
           <Text
             numberOfLines={1}

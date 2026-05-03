@@ -1,5 +1,7 @@
 import { v } from "convex/values";
 import { internalQuery, query } from "../_generated/server";
+import type { Id } from "../_generated/dataModel";
+import type { QueryCtx } from "../_generated/server";
 import { getCurrentUserFromCtx } from "../auth";
 
 const linkContentType = v.union(
@@ -10,6 +12,29 @@ const linkContentType = v.union(
   v.literal("document"),
   v.literal("generic"),
 );
+
+const getMetadataByLinkId = async (ctx: QueryCtx, linkId: Id<"links">) => {
+  return await ctx.db
+    .query("link_metadata")
+    .withIndex("by_link", (q) => q.eq("linkId", linkId))
+    .unique();
+};
+
+const withReadingTime = async <Link extends { _id: Id<"links"> }>(
+  ctx: QueryCtx,
+  links: Link[],
+) => {
+  return await Promise.all(
+    links.map(async (link) => {
+      const metadata = await getMetadataByLinkId(ctx, link._id);
+
+      return {
+        ...link,
+        readingTime: metadata?.readingTime,
+      };
+    }),
+  );
+};
 
 export const getUserRecentLinks = query({
   args: {},
@@ -42,7 +67,7 @@ export const getUserRecentLinks = query({
       byId.set(link._id, link);
     }
 
-    return Array.from(byId.values())
+    const links = Array.from(byId.values())
       .sort((a, b) => {
         const aTime = a.lastViewedAt ?? a._creationTime;
         const bTime = b.lastViewedAt ?? b._creationTime;
@@ -50,6 +75,8 @@ export const getUserRecentLinks = query({
         return bTime - aTime;
       })
       .slice(0, 8);
+
+    return await withReadingTime(ctx, links);
   },
 });
 
@@ -73,7 +100,7 @@ export const searchUserLinks = query({
 
     const limit = Math.min(Math.max(args.limit ?? 20, 1), 50);
 
-    return await ctx.db
+    const links = await ctx.db
       .query("links")
       .withSearchIndex("search_links", (q) => {
         const filtered = q.search("title", searchQuery).eq("userId", user._id);
@@ -89,6 +116,8 @@ export const searchUserLinks = query({
         return filtered;
       })
       .take(limit);
+
+    return await withReadingTime(ctx, links);
   },
 });
 

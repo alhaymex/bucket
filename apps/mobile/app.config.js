@@ -3,14 +3,12 @@
 // Values are accessed at runtime via Constants.expoConfig?.extra?.posthogProjectToken
 // @see src/lib/posthog.ts
 
-const baseConfig = require("./app.json");
-
 /** @type {import('expo/config').ExpoConfig} */
-module.exports = {
-  ...baseConfig.expo,
+module.exports = ({ config }) => ({
+  ...config,
   extra: {
-    ...baseConfig.expo.extra,
+    ...config.extra,
     posthogProjectToken: process.env.POSTHOG_PROJECT_TOKEN,
     posthogHost: process.env.POSTHOG_HOST,
   },
-};
+});
