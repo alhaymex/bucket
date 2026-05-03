@@ -1,10 +1,11 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-const { acquirePageMock, releasePageMock, extractReadableArticleMock } = vi.hoisted(() => ({
-  acquirePageMock: vi.fn(),
-  releasePageMock: vi.fn(),
-  extractReadableArticleMock: vi.fn(),
-}));
+const { acquirePageMock, releasePageMock, extractReadableArticleMock } =
+  vi.hoisted(() => ({
+    acquirePageMock: vi.fn(),
+    releasePageMock: vi.fn(),
+    extractReadableArticleMock: vi.fn(),
+  }));
 
 vi.mock("../src/lib/browserPool", () => ({
   browserPool: {
