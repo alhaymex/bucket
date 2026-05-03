@@ -1,23 +1,32 @@
 import { useColors } from "@/hooks/useColors";
 import { urlSchema } from "@bucket/common";
 import { useRouter } from "expo-router";
-import { ArrowUpRight, Pause, Play, Share, X } from "lucide-react-native";
+import {
+  ArrowUpRight,
+  Pause,
+  Play,
+  Share as ShareIcon,
+  X,
+} from "lucide-react-native";
 import React, { useCallback, useRef, useState } from "react";
-import { Animated, Linking, Pressable, Text, View } from "react-native";
+import { Animated, Linking, Pressable, Share, Text, View } from "react-native";
 
 interface LinkScreenHeaderProps {
   title: string;
   url: string;
+  readingTime?: number;
 }
 
-export const LinkScreenHeader = ({ url, title }: LinkScreenHeaderProps) => {
+export const LinkScreenHeader = ({
+  url,
+  title,
+  readingTime,
+}: LinkScreenHeaderProps) => {
   const token = useColors();
   const router = useRouter();
   const [isPlaying, setIsPlaying] = useState(false);
   const [elapsed, setElapsed] = useState(0);
   const progressAnim = useRef(new Animated.Value(0)).current;
-
-  const totalSeconds = 240;
 
   const formatTime = (s: number) => {
     const m = Math.floor(s / 60);
@@ -42,13 +51,21 @@ export const LinkScreenHeader = ({ url, title }: LinkScreenHeaderProps) => {
     outputRange: ["0%", "100%"],
   });
 
+  const shareLink = async () => {
+    await Share.share({
+      title: title ?? "Shared link",
+      message: url,
+      url,
+    });
+  };
+
   return (
     <View>
       <View className="flex-row items-center justify-between px-4 py-3">
         <View className="flex-row items-center gap-3 flex-1 min-w-0">
           <Pressable
             onPress={() => router.back()}
-            className="h-9 w-9 items-center justify-center rounded-full bg-bucket-muted flex-shrink-0"
+            className="h-9 w-9 items-center justify-center rounded-full bg-bucket-muted flex-shrink-0 active:opacity-50"
           >
             <X size={15} color={token.foreground} />
           </Pressable>
@@ -65,14 +82,22 @@ export const LinkScreenHeader = ({ url, title }: LinkScreenHeaderProps) => {
               numberOfLines={1}
               ellipsizeMode="tail"
             >
-              {url.replace(/^https?:\/\//, "").split("/")[0]}
+              {url.replace(/^https?:\/\//, "").split("/")[0]} • {readingTime}{" "}
+              min read
             </Text>
           </View>
         </View>
 
         <View className="flex-row items-center gap-2 flex-shrink-0 ml-3">
-          <Pressable className="h-9 w-9 items-center justify-center rounded-full bg-bucket-muted opacity-50">
-            <Share size={14} color={token.foreground} fill={token.foreground} />
+          <Pressable
+            className="h-9 w-9 items-center justify-center rounded-full bg-bucket-muted active:opacity-50"
+            onPress={() => shareLink()}
+          >
+            <ShareIcon
+              size={14}
+              color={token.foreground}
+              fill={token.foreground}
+            />
           </Pressable>
           <Pressable
             // onPress={togglePlay}

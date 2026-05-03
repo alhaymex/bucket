@@ -35,7 +35,6 @@ export const OtpScreen = ({ email }: { email: string }) => {
   const isComplete = code.length === OTP_LENGTH;
 
   const handleCodeSubmit = async (submittedCode: string) => {
-    console.log("Submitted code:", submittedCode);
     setLoading(true);
 
     if (!signUp) return;
