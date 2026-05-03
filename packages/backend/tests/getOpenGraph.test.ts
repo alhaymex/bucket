@@ -9,6 +9,21 @@ import {
   vi,
 } from "vitest";
 
+const safeFetchMocks = vi.hoisted(() => ({
+  fetchMetadataHtml: vi.fn(),
+  fetchSmallJson: vi.fn(),
+}));
+
+vi.mock("../convex/utils/safeFetch", () => ({
+  fetchMetadataHtml: safeFetchMocks.fetchMetadataHtml,
+  fetchSmallJson: safeFetchMocks.fetchSmallJson,
+  METADATA_FETCH_TIMEOUT_MS: 8_000,
+  METADATA_MAX_REDIRECTS: 5,
+  METADATA_MAX_HTML_BYTES: 1_048_576,
+  OEMBED_FETCH_TIMEOUT_MS: 5_000,
+  OEMBED_MAX_JSON_BYTES: 65_536,
+}));
+
 type ExtractorResponse =
   | {
       status: "ok";
@@ -97,6 +112,9 @@ afterAll(async () => {
 });
 
 beforeEach(() => {
+  safeFetchMocks.fetchMetadataHtml.mockReset();
+  safeFetchMocks.fetchSmallJson.mockReset();
+
   upstreamStatus = 403;
   upstreamHtml =
     "<html><head><title>Just a moment...</title></head><body><h1>Just a moment...</h1></body></html>";
@@ -118,6 +136,48 @@ beforeEach(() => {
       '<article><p>Fallback body</p><script>alert("x")</script><a href="/next">Next</a></article>',
   };
 
+  safeFetchMocks.fetchMetadataHtml.mockImplementation(async (url: string) => {
+    if (upstreamStatus >= 200 && upstreamStatus < 300) {
+      return {
+        ok: true,
+        url,
+        status: upstreamStatus,
+        headers: new Headers({
+          "content-type": "text/html",
+        }),
+        text: upstreamHtml,
+      };
+    }
+
+    return {
+      ok: false,
+      url,
+      status: upstreamStatus,
+      reason: "invalid_response",
+    };
+  });
+
+  safeFetchMocks.fetchSmallJson.mockImplementation(async () => {
+    if (youtubeOEmbedStatus >= 200 && youtubeOEmbedStatus < 300) {
+      return {
+        ok: true,
+        url: "https://www.youtube.com/oembed",
+        status: youtubeOEmbedStatus,
+        headers: new Headers({
+          "content-type": "application/json",
+        }),
+        text: youtubeOEmbedBody ? JSON.stringify(youtubeOEmbedBody) : "",
+      };
+    }
+
+    return {
+      ok: false,
+      url: "https://www.youtube.com/oembed",
+      status: youtubeOEmbedStatus,
+      reason: "invalid_response",
+    };
+  });
+
   vi.spyOn(globalThis, "fetch").mockImplementation(async (input, init) => {
     const url =
       typeof input === "string"
@@ -129,19 +189,6 @@ beforeEach(() => {
     if (url.startsWith(extractorBaseUrl)) {
       return originalFetch(input as RequestInfo | URL, init);
     }
-
-    if (url.startsWith("https://www.youtube.com/oembed")) {
-      return new Response(
-        youtubeOEmbedBody ? JSON.stringify(youtubeOEmbedBody) : "",
-        {
-          status: youtubeOEmbedStatus,
-          headers: {
-            "content-type": "application/json",
-          },
-        },
-      );
-    }
-
     return new Response(upstreamHtml, {
       status: upstreamStatus,
       headers: {
@@ -206,7 +253,8 @@ describe("getOpenGraph fallback path", () => {
 
     await handleOpenGraph(ctx as any, { linkId: "link_123" });
 
-    expect(globalThis.fetch).toHaveBeenCalled();
+    expect(safeFetchMocks.fetchMetadataHtml).toHaveBeenCalled();
+    expect(safeFetchMocks.fetchSmallJson).toHaveBeenCalled();
     expect(ctx.runMutation).toHaveBeenCalledTimes(1);
     const [, mutationArgs] = ctx.runMutation.mock.calls[0];
 
@@ -258,6 +306,34 @@ describe("getOpenGraph fallback path", () => {
     });
   });
 
+  it("marks embed links ready with minimal metadata when direct fetch fails", async () => {
+    const ctx = createTestContext();
+    ctx.runQuery.mockResolvedValue({
+      _id: "link_123",
+      canonicalUrl: "https://video.example.com/watch/abc123",
+      title: "Existing Video Title",
+      renderType: "embed",
+      embedUrl: "https://video.example.com/embed/abc123",
+    });
+    safeFetchMocks.fetchMetadataHtml.mockResolvedValueOnce({
+      ok: false,
+      url: "https://video.example.com/watch/abc123",
+      reason: "timeout",
+    });
+
+    await handleOpenGraph(ctx as any, { linkId: "link_123" });
+
+    expect(globalThis.fetch).not.toHaveBeenCalled();
+    expect(ctx.runMutation).toHaveBeenCalledTimes(1);
+    const [, mutationArgs] = ctx.runMutation.mock.calls[0];
+
+    expect(mutationArgs).toEqual({
+      linkId: "link_123",
+      title: "Existing Video Title",
+      faviconUrl: "https://video.example.com/favicon.ico",
+    });
+  });
+
   it("calls the extractor when direct fetch is blocked and stores sanitized fallback content", async () => {
     const ctx = createTestContext();
 
@@ -293,7 +369,55 @@ describe("getOpenGraph fallback path", () => {
     expect(mutationArgs.html).toContain('href="https://example.com/next"');
   });
 
-  it("handles extractor unreadable responses without storing broken fallback html", async () => {
+  it.each([
+    "unsupported_content_type",
+    "response_too_large",
+    "timeout",
+  ] as const)(
+    "uses extractor fallback when direct reader fetch fails with %s",
+    async (reason) => {
+      safeFetchMocks.fetchMetadataHtml.mockResolvedValueOnce({
+        ok: false,
+        url: "https://example.com/articles/original",
+        reason,
+      });
+      const ctx = createTestContext();
+
+      await handleOpenGraph(ctx as any, { linkId: "link_123" });
+
+      expect(ctx.runMutation).toHaveBeenCalledTimes(1);
+      const [, mutationArgs] = ctx.runMutation.mock.calls[0];
+
+      expect(mutationArgs).toMatchObject({
+        linkId: "link_123",
+        title: "Fallback Article",
+        siteName: "Example Site",
+        text: "word ".repeat(450).trim(),
+      });
+    },
+  );
+
+  it("marks invalid canonical URLs as error without fetching metadata", async () => {
+    const ctx = createTestContext();
+    ctx.runQuery.mockResolvedValue({
+      _id: "link_123",
+      canonicalUrl: "http://127.0.0.1/admin",
+      renderType: "reader",
+    });
+
+    await handleOpenGraph(ctx as any, { linkId: "link_123" });
+
+    expect(safeFetchMocks.fetchMetadataHtml).not.toHaveBeenCalled();
+    expect(globalThis.fetch).not.toHaveBeenCalled();
+    expect(ctx.runMutation).toHaveBeenCalledTimes(1);
+    const [, mutationArgs] = ctx.runMutation.mock.calls[0];
+
+    expect(mutationArgs).toEqual({
+      linkId: "link_123",
+    });
+  });
+
+  it("marks reader links error when direct fetch and extractor unreadable both fail", async () => {
     extractorResponse = {
       status: "unreadable",
       finalUrl: "https://example.com/articles/fallback",
@@ -307,15 +431,34 @@ describe("getOpenGraph fallback path", () => {
     expect(ctx.runMutation).toHaveBeenCalledTimes(1);
     const [, mutationArgs] = ctx.runMutation.mock.calls[0];
 
-    expect(mutationArgs).toMatchObject({
+    expect(mutationArgs).toEqual({
       linkId: "link_123",
-      html: undefined,
-      text: undefined,
-      readingTime: undefined,
     });
   });
 
-  it("handles extractor error responses without throwing and without storing fallback html", async () => {
+  it("does not store extractor fallback content that still looks blocked", async () => {
+    extractorResponse = {
+      status: "ok",
+      finalUrl: "https://example.com/articles/fallback",
+      title: "Just a moment",
+      excerpt: "Checking if the site connection is secure",
+      siteName: "Example Site",
+      textContent: "Checking if the site connection is secure. ".repeat(20),
+      htmlFragment: `<article><p>${"Checking if the site connection is secure. ".repeat(20)}</p></article>`,
+    };
+    const ctx = createTestContext();
+
+    await handleOpenGraph(ctx as any, { linkId: "link_123" });
+
+    expect(ctx.runMutation).toHaveBeenCalledTimes(1);
+    const [, mutationArgs] = ctx.runMutation.mock.calls[0];
+
+    expect(mutationArgs).toEqual({
+      linkId: "link_123",
+    });
+  });
+
+  it("marks reader links error when direct fetch and extractor error both fail", async () => {
     extractorResponse = {
       status: "error",
       errorCode: "EXTRACTION_FAILED",
@@ -330,11 +473,8 @@ describe("getOpenGraph fallback path", () => {
     expect(ctx.runMutation).toHaveBeenCalledTimes(1);
     const [, mutationArgs] = ctx.runMutation.mock.calls[0];
 
-    expect(mutationArgs).toMatchObject({
+    expect(mutationArgs).toEqual({
       linkId: "link_123",
-      html: undefined,
-      text: undefined,
-      readingTime: undefined,
     });
   });
 });

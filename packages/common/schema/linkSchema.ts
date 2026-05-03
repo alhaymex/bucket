@@ -29,7 +29,7 @@ const isPublicHttpUrl = (value: string) => {
       (url.protocol === "http:" || url.protocol === "https:") &&
       !url.username &&
       !url.password &&
-      isPublicHostname(url.hostname)
+      isPublicUrlHostname(url.hostname)
     );
   } catch {
     return false;
@@ -132,7 +132,7 @@ function isCanonicalDecimalOctet(value: string) {
   return Number.isInteger(octet) && octet >= 0 && octet <= 255;
 }
 
-function isPublicHostname(hostname: string) {
+export function isPublicUrlHostname(hostname: string) {
   const normalized = hostname.toLowerCase().replace(/\.$/, "");
 
   if (!normalized) return false;
@@ -157,6 +157,22 @@ function isPublicHostname(hostname: string) {
 
   // Zod 4 exposes this regex for domain-only hostname validation.
   return z.regexes.domain.test(normalized);
+}
+
+export function isPublicIpHostname(hostname: string) {
+  const normalized = hostname.toLowerCase().replace(/\.$/, "");
+  const bracketedIpv6 =
+    normalized.includes(":") && !isIpv6Hostname(normalized)
+      ? `[${normalized}]`
+      : normalized;
+
+  if (isIpv6Hostname(bracketedIpv6)) {
+    return isPublicIpv6(bracketedIpv6);
+  }
+
+  const ipv4 = parseIpv4(normalized);
+
+  return ipv4 ? isPublicIpv4(ipv4) : false;
 }
 
 function isIpHostname(hostname: string) {

@@ -1,4 +1,18 @@
+"use node";
+
+import {
+  fetchSmallJson,
+  METADATA_MAX_REDIRECTS,
+  OEMBED_FETCH_TIMEOUT_MS,
+  OEMBED_MAX_JSON_BYTES,
+} from "./safeFetch";
+
 const YOUTUBE_OEMBED_URL = "https://www.youtube.com/oembed";
+const OEMBED_ALLOWED_CONTENT_TYPES = [
+  "application/json",
+  "application/json; charset=utf-8",
+  "text/json",
+];
 
 type YouTubeOEmbedResponse = {
   title?: string;
@@ -16,17 +30,20 @@ export const fetchYouTubeOEmbed = async ({
   endpoint.searchParams.set("format", "json");
 
   try {
-    const response = await fetch(endpoint, {
-      headers: {
-        "User-Agent": "Mozilla/5.0",
-      },
+    const response = await fetchSmallJson({
+      url: endpoint.toString(),
+      timeoutMs: OEMBED_FETCH_TIMEOUT_MS,
+      maxBytes: OEMBED_MAX_JSON_BYTES,
+      maxRedirects: METADATA_MAX_REDIRECTS,
+      allowedContentTypes: OEMBED_ALLOWED_CONTENT_TYPES,
+      userAgent: "Mozilla/5.0",
     });
 
-    if (!response.ok) return null;
+    if (!response.ok) {
+      return null;
+    }
 
-    const json = (await response.json()) as YouTubeOEmbedResponse;
-
-    console.log("[DEBUG] youtube oEmbed response", json);
+    const json = JSON.parse(response.text) as YouTubeOEmbedResponse;
 
     return {
       title: json.title,
