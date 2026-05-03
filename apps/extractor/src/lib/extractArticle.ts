@@ -3,8 +3,9 @@ import {
   looksLikeBlockedPage,
   type ExtractArticleResponse,
 } from "@bucket/common";
+import type { Page } from "puppeteer";
 import { extractorConfig } from "../config";
-import { launchBrowser } from "./browser";
+import { browserPool } from "./browserPool";
 import { extractReadableArticle } from "./readability";
 
 const BLOCKED_RESOURCE_TYPES = new Set<string>([
@@ -16,13 +17,7 @@ const BLOCKED_RESOURCE_TYPES = new Set<string>([
   "texttrack",
 ]);
 
-const enableLightweightPageMode = async (
-  page: Awaited<ReturnType<typeof launchBrowser>> extends {
-    newPage: () => Promise<infer T>;
-  }
-    ? T
-    : never,
-) => {
+const enableLightweightPageMode = async (page: Page) => {
   await page.setRequestInterception(true);
   page.on("request", (request) => {
     const action = BLOCKED_RESOURCE_TYPES.has(request.resourceType())
@@ -33,14 +28,7 @@ const enableLightweightPageMode = async (
   });
 };
 
-const waitForPageToSettle = async (
-  page: Awaited<ReturnType<typeof launchBrowser>> extends {
-    newPage: () => Promise<infer T>;
-  }
-    ? T
-    : never,
-  navigationTimeout: number,
-) => {
+const waitForPageToSettle = async (page: Page, navigationTimeout: number) => {
   const selectorTimeout = Math.min(navigationTimeout, 5000);
   const settleTimeout = Math.min(navigationTimeout, 8000);
 
@@ -67,18 +55,11 @@ export const extractArticle = async ({
 }): Promise<ExtractArticleResponse> => {
   console.log("[extractArticle] starting", { url, timeoutMs });
 
-  let browser;
+  const page = await browserPool.acquirePage();
   try {
-    browser = await launchBrowser();
-    console.log("[extractArticle] browser launched");
-    const page = await browser.newPage();
     const navigationTimeout = timeoutMs ?? extractorConfig.puppeteer.timeoutMs;
 
     await enableLightweightPageMode(page);
-
-    await page.setUserAgent(
-      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
-    );
 
     console.log("[extractArticle] navigating", { url, navigationTimeout });
     await page.goto(url, {
@@ -246,8 +227,6 @@ export const extractArticle = async ({
         error instanceof Error ? error.message : "Unknown extraction error",
     };
   } finally {
-    if (browser) {
-      await browser.close();
-    }
+    await browserPool.releasePage(page);
   }
 };

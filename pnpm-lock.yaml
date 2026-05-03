@@ -52,6 +52,9 @@ importers:
       puppeteer-extra-plugin-stealth:
         specifier: ^2.11.2
         version: 2.11.2(puppeteer-extra@3.3.6(puppeteer-core@24.42.0(bufferutil@4.1.0)(utf-8-validate@6.0.6))(puppeteer@24.42.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)))
+      tsx:
+        specifier: ^4.21.0
+        version: 4.21.0
       zod:
         specifier: ^4.3.6
         version: 4.3.6
@@ -59,9 +62,6 @@ importers:
       '@types/jsdom':
         specifier: ^28.0.1
         version: 28.0.1
-      tsx:
-        specifier: ^4.21.0
-        version: 4.21.0
       vitest:
         specifier: ^4.1.5
         version: 4.1.5(@types/node@24.12.2)(jsdom@29.0.2(@noble/hashes@1.8.0))(vite@8.0.10(@types/node@24.12.2)(esbuild@0.27.0)(jiti@1.21.7)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.3))
