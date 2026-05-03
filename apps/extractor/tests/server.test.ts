@@ -1,11 +1,21 @@
 import type { ExtractArticleResponse } from "@bucket/common";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 process.env.EXTRACTOR_SHARED_SECRET = "test-secret";
 
 let buildServerPromise: Promise<typeof import("../src/server")> | null = null;
 
 const appsUnderTest = new Set<Awaited<ReturnType<typeof createTestServer>>>();
+
+const { statusMock } = vi.hoisted(() => ({
+  statusMock: vi.fn(),
+}));
+
+vi.mock("../src/lib/browserPool", () => ({
+  browserPool: {
+    status: statusMock,
+  },
+}));
 
 const getBuildServer = async () => {
   buildServerPromise ??= import("../src/server");
@@ -45,6 +55,13 @@ afterEach(async () => {
 
 describe("extractor HTTP routes", () => {
   it("GET /healthz is public", async () => {
+    statusMock.mockReturnValue({
+      browser: "connected",
+      activePages: 0,
+      queuedRequests: 0,
+      maxConcurrency: 4,
+    });
+
     const app = await createTestServer();
 
     const response = await app.inject({
@@ -53,7 +70,13 @@ describe("extractor HTTP routes", () => {
     });
 
     expect(response.statusCode).toBe(200);
-    expect(response.json()).toEqual({ ok: true });
+    expect(response.json()).toEqual({
+      ok: true,
+      browser: "connected",
+      activePages: 0,
+      queuedRequests: 0,
+      maxConcurrency: 4,
+    });
   });
 
   it("POST /internal/extract/article requires auth", async () => {

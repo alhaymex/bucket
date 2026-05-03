@@ -1,0 +1,15 @@
+services:
+  extractor:
+    build:
+      context: ../../
+      dockerfile: apps/extractor/Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - EXTRACTOR_SHARED_SECRET=${EXTRACTOR_SHARED_SECRET}
+    deploy:
+      resources:
+        limits:
+          memory: 1536M
