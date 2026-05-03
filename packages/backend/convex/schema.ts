@@ -126,4 +126,9 @@ export default defineSchema({
   })
     .index("by_link", ["linkId"])
     .index("by_next_check", ["nextCheckAt"]),
+
+  waitlist: defineTable({
+    email: v.string(),
+    source: v.optional(v.string()),
+  }).index("by_email", ["email"]),
 });

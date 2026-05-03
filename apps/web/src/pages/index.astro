@@ -1,0 +1,672 @@
+---
+import Layout from "../layouts/Layout.astro";
+
+const currentYear = new Date().getFullYear();
+---
+
+<Layout>
+  <div class="page">
+    <div class="grain" aria-hidden="true"></div>
+
+    <nav id="main-nav">
+      <div class="nav-inner">
+        <a href="/" class="logo" id="logo">
+          <img src="/logo.png" alt="Bucket Logo" width="24" height="24" />
+          <span>Bucket</span>
+        </a>
+        <div class="nav-links">
+          <a href="https://github.com/alhaymex/bucket" target="_blank" rel="noopener noreferrer">GitHub</a>
+        </div>
+      </div>
+    </nav>
+
+    <main>
+      <section class="hero" id="hero-section">
+        <div class="hero-badge" id="hero-badge">
+          <span class="badge-dot"></span>
+          Now in early access
+        </div>
+
+        <h1 id="hero-title">
+          Collect everything.<br />
+          <span class="hero-dim">Organize effortlessly.</span>
+        </h1>
+
+        <p class="hero-sub" id="hero-subtitle">
+          A minimal workspace to capture links, notes, and ideas —
+          <br class="hide-mobile" />
+          then find them exactly when you need them.
+        </p>
+
+        <div class="hero-actions" id="hero-actions">
+          <button class="btn btn-primary trigger-waitlist" data-source="hero">
+            Join the waitlist
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></svg>
+          </button>
+          <a href="https://github.com/alhaymex/bucket" target="_blank" rel="noopener noreferrer" class="btn btn-ghost" id="cta-github">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+            >
+              <path
+                d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"
+              ></path>
+            </svg>
+            GitHub
+          </a>
+        </div>
+      </section>
+
+      <section class="features" id="features">
+        <div class="features-grid">
+          <div class="feature-card" id="feature-capture">
+            <div class="feature-icon">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M12 5v14" />
+                <path d="M5 12h14" />
+              </svg>
+            </div>
+            <h3>Instant capture</h3>
+            <p>Save links, notes, and snippets in one click. No friction, no setup.</p>
+          </div>
+
+          <div class="feature-card" id="feature-organize">
+            <div class="feature-icon">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <rect x="3" y="3" width="7" height="7" rx="1" />
+                <rect x="14" y="3" width="7" height="7" rx="1" />
+                <rect x="3" y="14" width="7" height="7" rx="1" />
+                <rect x="14" y="14" width="7" height="7" rx="1" />
+              </svg>
+            </div>
+            <h3>Smart buckets</h3>
+            <p>Organize into collections that make sense to you. Tag, filter, done.</p>
+          </div>
+
+          <div class="feature-card" id="feature-search">
+            <div class="feature-icon">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.3-4.3" />
+              </svg>
+            </div>
+            <h3>Find anything</h3>
+            <p>Full-text search across all your saved content. Always one keystroke away.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="bottom-cta" id="bottom-cta">
+        <p class="bottom-cta-text">Ready to start?</p>
+        <button class="btn btn-primary trigger-waitlist" data-source="bottom">
+          Join the waitlist
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></svg>
+        </button>
+      </section>
+    </main>
+
+    <footer id="main-footer">
+      <div class="footer-inner">
+        <span class="footer-copy">&copy; {currentYear} Bucket</span>
+        <div class="footer-links">
+          <a href="https://x.com/alhaymexT" target="_blank" rel="noopener noreferrer" id="footer-twitter">X</a>
+          <a href="https://github.com/alhaymex/bucket" target="_blank" rel="noopener noreferrer" id="footer-github">GitHub</a>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <dialog id="waitlist-modal" class="modal">
+    <div class="modal-content">
+      <button class="modal-close" aria-label="Close modal">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+      <div class="modal-header">
+        <h2>Join the waitlist</h2>
+        <p>Enter your email to get early access.</p>
+      </div>
+      <div class="waitlist-wrapper">
+        <form class="waitlist-form" id="modal-waitlist-form">
+          <input type="email" name="email" required placeholder="name@example.com" class="input" />
+          <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 12px;">
+            Submit
+          </button>
+        </form>
+        <div class="waitlist-success" style="display: none;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+          You're on the list!
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <script>
+    const url = import.meta.env.PUBLIC_CONVEX_SITE_URL + "/waitlist";
+    const modal = document.getElementById("waitlist-modal") as HTMLDialogElement;
+    const closeBtn = document.querySelector(".modal-close");
+    const form = document.getElementById("modal-waitlist-form") as HTMLFormElement;
+    let currentSource = "unknown";
+
+    document.querySelectorAll(".trigger-waitlist").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        currentSource = (e.currentTarget as HTMLElement).dataset.source || "unknown";
+        modal.showModal();
+      });
+    });
+
+    closeBtn?.addEventListener("click", () => {
+      modal.close();
+    });
+
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) {
+        modal.close();
+      }
+    });
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = (form.querySelector('input[name="email"]') as HTMLInputElement).value;
+      
+      const submitBtn = form.querySelector('button[type="submit"]') as HTMLButtonElement;
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = "Joining...";
+
+      try {
+        await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, source: currentSource }),
+        });
+        
+        form.style.display = "none";
+        (form.nextElementSibling as HTMLElement).style.display = "flex";
+        
+        import("https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.module.mjs").then((module) => {
+          module.default({
+            particleCount: 100,
+            spread: 70,
+            origin: { y: 0.6 }
+          });
+        });
+      } catch (err) {
+        console.error(err);
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = "Try again";
+      }
+    });
+  </script>
+</Layout>
+
+<style>
+  .page {
+    position: relative;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .grain {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.03;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: 128px;
+  }
+
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(16px) saturate(1.2);
+    -webkit-backdrop-filter: blur(16px) saturate(1.2);
+    background: rgba(10, 10, 11, 0.8);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav-inner {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 24px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    letter-spacing: -0.01em;
+    transition: opacity var(--transition);
+  }
+
+  .logo:hover {
+    opacity: 0.8;
+  }
+
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+  }
+
+  .nav-links a {
+    transition: color var(--transition);
+  }
+
+  .nav-links a:hover {
+    color: var(--text-primary);
+  }
+
+  .nav-cta {
+    color: var(--text-primary) !important;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-weight: 500;
+    transition:
+      background var(--transition),
+      border-color var(--transition);
+  }
+
+  .nav-cta:hover {
+    background: var(--bg-elevated);
+    border-color: var(--border-hover);
+  }
+
+  .hero {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 120px 24px 80px;
+    text-align: center;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    padding: 6px 14px;
+    border-radius: 100px;
+    margin-bottom: 32px;
+    animation: fadeInUp 0.6s ease-out both;
+  }
+
+  .badge-dot {
+    width: 6px;
+    height: 6px;
+    background: #22c55e;
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  h1 {
+    font-size: clamp(2.4rem, 6vw, 3.6rem);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.035em;
+    margin-bottom: 20px;
+    animation: fadeInUp 0.6s ease-out 0.1s both;
+  }
+
+  .hero-dim {
+    color: var(--text-tertiary);
+  }
+
+  .hero-sub {
+    font-size: clamp(1rem, 2.2vw, 1.15rem);
+    color: var(--text-secondary);
+    max-width: 520px;
+    margin: 0 auto 40px;
+    line-height: 1.7;
+    animation: fadeInUp 0.6s ease-out 0.2s both;
+  }
+
+  .hero-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    animation: fadeInUp 0.6s ease-out 0.3s both;
+  }
+
+  /* Forms */
+  .waitlist-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .waitlist-form {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+    max-width: 400px;
+  }
+
+  .input {
+    flex: 1;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 16px;
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    font-family: inherit;
+    outline: none;
+    transition: border-color var(--transition);
+  }
+
+  .input:focus {
+    border-color: var(--text-tertiary);
+  }
+
+  .waitlist-success {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #22c55e;
+    font-size: 0.95rem;
+    font-weight: 500;
+    padding: 10px 0;
+    animation: fadeInUp 0.4s ease-out;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: var(--radius-sm);
+    font-size: 0.875rem;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    transition:
+      transform var(--transition),
+      background var(--transition),
+      box-shadow var(--transition),
+      border-color var(--transition);
+  }
+
+  .btn:active {
+    transform: scale(0.97);
+  }
+
+  .btn-primary {
+    background: var(--text-primary);
+    color: var(--bg);
+  }
+
+  .btn-primary:hover {
+    background: var(--accent);
+    box-shadow: 0 0 24px rgba(255, 255, 255, 0.06);
+  }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+  }
+
+  .btn-ghost:hover {
+    color: var(--text-primary);
+    border-color: var(--border-hover);
+    background: var(--bg-surface);
+  }
+
+  .features {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 40px 24px 100px;
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .feature-card {
+    background: var(--bg);
+    padding: 32px 28px;
+    transition: background var(--transition);
+  }
+
+  .feature-card:hover {
+    background: var(--bg-elevated);
+  }
+
+  .feature-icon {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    margin-bottom: 16px;
+    color: var(--text-secondary);
+  }
+
+  .feature-card h3 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+    letter-spacing: -0.01em;
+  }
+
+  .feature-card p {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+
+  .bottom-cta {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 60px 24px 100px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .bottom-cta-text {
+    font-size: 1.4rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--text-secondary);
+  }
+
+  footer {
+    margin-top: auto;
+    border-top: 1px solid var(--border);
+  }
+
+  .footer-inner {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: var(--text-tertiary);
+  }
+
+  .footer-links {
+    display: flex;
+    gap: 20px;
+  }
+
+  .footer-links a {
+    transition: color var(--transition);
+  }
+
+  .footer-links a:hover {
+    color: var(--text-secondary);
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes pulse {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.4;
+    }
+  }
+
+  .hide-mobile {
+    display: inline;
+  }
+
+  @media (max-width: 768px) {
+    .hero {
+      padding: 80px 20px 60px;
+    }
+
+    .features-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .hero-actions {
+      flex-direction: column;
+      width: 100%;
+    }
+
+    .btn {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .hide-mobile {
+      display: none;
+    }
+  }
+  /* Modal */
+  .modal {
+    margin: auto;
+    padding: 0;
+    border: none;
+    border-radius: var(--radius);
+    background: transparent;
+    max-width: 400px;
+    width: 90%;
+  }
+
+  .modal::backdrop {
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+  }
+
+  .modal-content {
+    position: relative;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 32px 24px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    color: var(--text-primary);
+  }
+
+  .modal-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color var(--transition);
+  }
+
+  .modal-close:hover {
+    color: var(--text-primary);
+  }
+
+  .modal-header {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+
+  .modal-header h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .modal-header p {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+  }
+
+  #waitlist-modal .waitlist-form {
+    flex-direction: column;
+  }
+</style>

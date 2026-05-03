@@ -186,5 +186,48 @@ http.route({
   method: "POST",
   handler: clerkWebhook,
 });
+http.route({
+  path: "/waitlist",
+  method: "OPTIONS",
+  handler: httpAction(async () => {
+    return new Response(null, {
+      status: 204,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "POST, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type",
+      },
+    });
+  }),
+});
+
+http.route({
+  path: "/waitlist",
+  method: "POST",
+  handler: httpAction(async (ctx, request) => {
+    try {
+      const body = await request.json();
+      if (!body.email || typeof body.email !== "string") {
+        return new Response("Missing or invalid email", { status: 400 });
+      }
+
+      await ctx.runMutation(internal.waitlist.add, {
+        email: body.email,
+        source: typeof body.source === "string" ? body.source : undefined,
+      });
+
+      return new Response(JSON.stringify({ success: true }), {
+        status: 200,
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+        },
+      });
+    } catch (e) {
+      console.log(e);
+      return new Response("Internal Server Error", { status: 500 });
+    }
+  }),
+});
 
 export default http;
