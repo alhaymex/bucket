@@ -7,13 +7,12 @@ import {
   Alert,
 } from "react-native";
 import { Controller, useForm } from "react-hook-form";
-import type { AddLinkType } from "@bucket/common";
+import { type AddLinkType, isUrl } from "@bucket/common";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AlignLeft, Clipboard, Link } from "lucide-react-native";
 import { useColors } from "@/hooks/useColors";
 import { useEffect, useState } from "react";
 import * as ExpoClipboard from "expo-clipboard";
-import { isUrl } from "@bucket/common";
 import { useRouter } from "expo-router";
 import { CollectionSelector } from "./CollectionSelector";
 import { TagInput } from "./TagInput";

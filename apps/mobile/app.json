@@ -46,6 +46,7 @@
       ],
       "expo-web-browser",
       "expo-image",
+      "expo-share-intent",
       [
         "@sentry/react-native/expo",
         {

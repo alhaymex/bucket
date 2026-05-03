@@ -76,6 +76,7 @@ export const ViewLinkScreen = ({ linkId }: { linkId: Id<"links"> }) => {
       <LinkScreenHeader
         url={data.link.canonicalUrl}
         title={data.link.title ?? "View"}
+        readingTime={data.metadata?.readingTime}
       />
       {data.link.renderType === "pdf" ? (
         <PDFView url={data.link.canonicalUrl} />

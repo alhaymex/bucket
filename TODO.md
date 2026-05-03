@@ -7,3 +7,5 @@
 [] Use clerk native sign in components
 [] Add a way to delete a bucket
 [] Update puppeteer to use headless shell for a smaller image size
+[] Add errors to input fields
+[] Add a centralized event handler for posthog

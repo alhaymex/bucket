@@ -9,7 +9,7 @@ export const saveLink = mutation({
   args: {
     url: v.string(),
     note: v.optional(v.string()),
-    collectionId: v.id("collections"),
+    collectionId: v.optional(v.id("collections")),
     tags: v.array(v.string()),
   },
   handler: async (ctx, args) => {
@@ -25,7 +25,24 @@ export const saveLink = mutation({
 
     const analyzed = analyzeUrl(parsedUrl.data);
 
-    const collection = await ctx.db.get("collections", args.collectionId);
+    let collectionId = args.collectionId;
+
+    if (!collectionId) {
+      const inbox = await ctx.db
+        .query("collections")
+        .withIndex("by_user_and_slug", (q) =>
+          q.eq("userId", user._id).eq("slug", "inbox"),
+        )
+        .unique();
+
+      if (!inbox) {
+        throw new Error("Inbox collection not found");
+      }
+
+      collectionId = inbox._id;
+    }
+
+    const collection = await ctx.db.get("collections", collectionId);
 
     if (!collection || collection.userId !== user._id)
       throw new Error("No collection found!");
